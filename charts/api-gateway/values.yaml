@@ -8,6 +8,7 @@ image:
 serviceAccount:
   create: true
   name: ""
+  annotations: {}
 
 service:
   type: ClusterIP
