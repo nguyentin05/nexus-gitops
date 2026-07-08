@@ -23,4 +23,4 @@ fi
 
 vault policy write external-secrets "${POLICY_DIR}/external-secrets.hcl"
 
-vault write auth/kubernetes/role/external-secrets   bound_service_account_names=external-secrets   bound_service_account_namespaces=external-secrets   policies=external-secrets   ttl=1h
+vault write auth/kubernetes/role/external-secrets   bound_service_account_names=external-secrets   bound_service_account_namespaces=apps   policies=external-secrets   ttl=1h
