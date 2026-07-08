@@ -1,0 +1,31 @@
+global:
+  domain: argocd.local
+  nodeSelector:
+    kubernetes.io/os: linux
+    role: system
+  tolerations:
+    - key: CriticalAddonsOnly
+      operator: Exists
+      effect: NoSchedule
+
+configs:
+  cm:
+    exec.enabled: false
+    admin.enabled: true
+    timeout.reconciliation: 120s
+
+server:
+  service:
+    type: ClusterIP
+
+controller:
+  replicas: 1
+
+repoServer:
+  replicas: 1
+
+applicationSet:
+  replicas: 1
+
+redis:
+  enabled: true

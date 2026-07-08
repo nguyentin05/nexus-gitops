@@ -1,0 +1,10 @@
+configs:
+  credentialTemplates:
+    app-example:
+      url: https://github.com/username-example
+      githubAppID: "1234567"
+      githubAppInstallationID: "123456789"
+      githubAppPrivateKey: |
+        -----BEGIN RSA PRIVATE KEY-----
+        #rsa private key
+        -----END RSA PRIVATE KEY-----

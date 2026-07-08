@@ -1,0 +1,15 @@
+installCRDs: true
+replicaCount: 1
+
+serviceAccount:
+  create: true
+  name: external-secrets
+
+# ESO is a platform controller, so it runs on the On-Demand system node group.
+global:
+  nodeSelector:
+    role: system
+  tolerations:
+    - key: CriticalAddonsOnly
+      operator: Exists
+      effect: NoSchedule
