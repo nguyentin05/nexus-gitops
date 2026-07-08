@@ -1,20 +1,22 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: envoy-gateway-config
+  name: kyverno-policies
   namespace: argocd
   annotations:
-    argocd.argoproj.io/sync-wave: "7"
+    argocd.argoproj.io/sync-wave: "5"
 spec:
   project: default
   source:
     repoURL: https://github.com/nguyentin05/nexus-gitops.git
     targetRevision: main
-    path: platform/envoy-gateway/manifests
+    path: platform/kyverno/manifests
   destination:
     server: https://kubernetes.default.svc
-    namespace: apps
+    namespace: kyverno
   syncPolicy:
     automated:
       prune: true
       selfHeal: true
+    syncOptions:
+      - ServerSideApply=true
