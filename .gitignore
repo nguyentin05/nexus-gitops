@@ -6,3 +6,6 @@
 **/charts/*.tgz
 
 # End of https://www.toptal.com/developers/gitignore/api/helm
+
+*.pem
+bootstrap/argocd-github-app-values.yaml
