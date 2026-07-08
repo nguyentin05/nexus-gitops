@@ -1,7 +1,7 @@
-#!/usr/bin/env bash
-set -euo pipefail
+#!/usr/bin/env sh
+set -eu
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+SCRIPT_DIR="$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)"
 POLICY_DIR="${VAULT_POLICY_DIR:-$(cd "${SCRIPT_DIR}/../policies" && pwd)}"
 KUBERNETES_CA_CERT="${KUBERNETES_CA_CERT:-/var/run/secrets/kubernetes.io/serviceaccount/ca.crt}"
 
@@ -15,7 +15,7 @@ vault kv put kv/auth-service/config placeholder=true
 
 vault auth enable kubernetes 2>/dev/null || true
 
-if [[ -f "$KUBERNETES_CA_CERT" ]]; then
+if [ -f "$KUBERNETES_CA_CERT" ]; then
   vault write auth/kubernetes/config     kubernetes_host="$KUBERNETES_HOST"     kubernetes_ca_cert=@"$KUBERNETES_CA_CERT"
 else
   vault write auth/kubernetes/config kubernetes_host="$KUBERNETES_HOST"
