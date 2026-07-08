@@ -19,9 +19,17 @@ server:
   authDelegator:
     enabled: true
 
+  nodeSelector:
+    role: system
+  tolerations:
+    - key: CriticalAddonsOnly
+      operator: Exists
+      effect: NoSchedule
+
   dataStorage:
     enabled: true
     size: 10Gi
+    storageClass: gp2
 
   ha:
     enabled: true
