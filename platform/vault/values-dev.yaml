@@ -12,7 +12,7 @@ server:
     create: true
     name: vault
     annotations:
-      eks.amazonaws.com/role-arn: REPLACE_WITH_DEV_VAULT_IRSA_ROLE_ARN
+      eks.amazonaws.com/role-arn: arn:aws:iam::065320271480:role/dev-vault-20260708041611768000000018
     serviceDiscovery:
       enabled: true
 
@@ -52,7 +52,7 @@ server:
 
         seal "awskms" {
           region     = "ap-southeast-1"
-          kms_key_id = "REPLACE_WITH_DEV_VAULT_KMS_KEY_ID"
+          kms_key_id = "a0764fe0-71ae-43b1-a006-e3c88a91ec32"
         }
 
         service_registration "kubernetes" {}
