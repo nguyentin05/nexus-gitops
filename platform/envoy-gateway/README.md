@@ -8,5 +8,6 @@ Current skeleton:
 - creates `GatewayClass/envoy`
 - creates `apps/public-gateway`
 - routes `/auth` to `auth-service`
+- exposes Envoy through an AWS ALB managed by AWS Load Balancer Controller
 
-The production edge is still a later infra task: `CloudFront -> WAF -> ALB -> Envoy Gateway`.
+The remaining production edge work is `Route53 -> CloudFront -> WAF -> ALB`.
