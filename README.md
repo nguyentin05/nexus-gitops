@@ -8,6 +8,7 @@ Architecture v2 baseline:
 - Vault runs in-cluster and uses AWS KMS auto-unseal.
 - External Secrets Operator syncs Vault KV v2 secrets into Kubernetes Secrets for apps.
 - Envoy Gateway is the gateway layer; the old `api-gateway` chart is deprecated.
+- AWS Load Balancer Controller manages public ALBs for Envoy Gateway.
 - Kyverno, monitoring, Rollouts, and app manifests will be added as GitOps-managed resources.
 
 ## Bootstrap
