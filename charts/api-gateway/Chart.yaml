@@ -1,7 +1,0 @@
-apiVersion: v2
-name: api-gateway
-description: Deprecated skeleton; Envoy Gateway is the platform gateway layer.
-type: application
-version: 0.1.0
-appVersion: "0.1.0"
-deprecated: true
