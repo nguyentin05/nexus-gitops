@@ -8,6 +8,6 @@ export VAULT_TOKEN="<admin-token>"
 ./scripts/bootstrap.sh
 ```
 
-The script enables KV v2 at `kv/`, creates placeholder secret paths for `api-gateway` and `auth-service`, configures Vault Kubernetes auth, and binds the `external-secrets/external-secrets` ServiceAccount to the `external-secrets` Vault policy.
+The script enables KV v2 at `kv/`, creates the placeholder secret path for `auth-service`, configures Vault Kubernetes auth, and binds the `apps/external-secrets` ServiceAccount to the `external-secrets` Vault policy.
 
 App pods no longer authenticate to Vault directly. External Secrets Operator reads Vault and creates Kubernetes Secrets for the apps.

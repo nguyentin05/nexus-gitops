@@ -11,5 +11,4 @@ Order:
 
 Current synced targets:
 
-- `kv/api-gateway/config` -> `apps/api-gateway-secrets`
 - `kv/auth-service/config` -> `apps/auth-service-secrets`
