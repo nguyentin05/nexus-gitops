@@ -4,13 +4,12 @@ metadata:
   name: system-node-proxy
   namespace: apps
 spec:
-  networkPublishing:
-    type: ClusterIPService
   provider:
     type: Kubernetes
     kubernetes:
       envoyService:
         name: envoy-public-gateway
+        type: ClusterIP
       envoyDeployment:
         pod:
           nodeSelector:
