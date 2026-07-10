@@ -1,6 +1,6 @@
 # AWS Load Balancer Controller
 
-AWS Load Balancer Controller reconciles Kubernetes `Ingress` resources into AWS ALBs.
+AWS Load Balancer Controller is installed so Kubernetes can bind workloads to AWS load balancer target groups.
 
 Current dev setup:
 
@@ -8,6 +8,7 @@ Current dev setup:
 - Namespace: `kube-system`
 - ServiceAccount: `aws-load-balancer-controller`
 - IRSA role: `dev-aws-load-balancer-controller-irsa`
-- Public ALB is defined in `platform/envoy-gateway/manifests/alb-ingress.yaml` and forwards to the Envoy Gateway data-plane service.
+- Terraform owns the public ALB, listener, target group, WAF, CloudFront, and DNS.
+- GitOps owns `TargetGroupBinding`, which registers the Envoy Gateway data-plane service into Terraform's `dev-envoy-gateway` target group.
 
-Terraform owns the IAM role and policy. GitOps owns the controller deployment and ALB-facing Kubernetes resources.
+The controller should not create the public API ALB from an `Ingress` in this architecture.

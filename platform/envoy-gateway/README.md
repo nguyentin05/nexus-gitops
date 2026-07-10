@@ -8,6 +8,8 @@ Current skeleton:
 - creates `GatewayClass/envoy`
 - creates `apps/public-gateway`
 - routes `/auth` to `auth-service`
-- exposes Envoy through an AWS ALB managed by AWS Load Balancer Controller
+- exposes Envoy through a Terraform-managed public ALB using `TargetGroupBinding`
 
-The remaining production edge work is `Route53 -> CloudFront -> WAF -> ALB`.
+Public request flow:
+
+`Cloudflare DNS -> CloudFront -> Terraform ALB -> Terraform Target Group -> TargetGroupBinding -> Envoy Gateway -> HTTPRoute -> auth-service`
