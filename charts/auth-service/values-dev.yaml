@@ -2,7 +2,7 @@ replicaCount: 1
 
 image:
   repository: 065320271480.dkr.ecr.ap-southeast-1.amazonaws.com/nexus-auth-service
-  tag: manual-20260711-dbfix
+  tag: manual-20260711-refactor
   pullPolicy: IfNotPresent
 
 service:
