@@ -1,7 +1,7 @@
 replicaCount: 1
 
 image:
-  repository: 065320271480.dkr.ecr.ap-southeast-1.amazonaws.com/nexus-auth-service
+  repository: 065320271480.dkr.ecr.ap-southeast-1.amazonaws.com/nexus-profile-service
   tag: manual-20260711-local
   pullPolicy: IfNotPresent
 
@@ -33,11 +33,11 @@ env:
 
 envFrom:
   - secretRef:
-      name: auth-service-secrets
+      name: profile-service-secrets
       optional: true
 
 serviceAccount:
   create: true
   name: ""
   annotations:
-    eks.amazonaws.com/role-arn: arn:aws:iam::065320271480:role/dev-auth-service-irsa
+    eks.amazonaws.com/role-arn: arn:aws:iam::065320271480:role/dev-profile-service-irsa

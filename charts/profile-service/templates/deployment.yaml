@@ -1,22 +1,22 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "auth-service.fullname" . }}
+  name: {{ include "profile-service.fullname" . }}
   labels:
-    {{- include "auth-service.labels" . | nindent 4 }}
+    {{- include "profile-service.labels" . | nindent 4 }}
 spec:
   replicas: {{ .Values.replicaCount }}
   selector:
     matchLabels:
-      app.kubernetes.io/name: {{ include "auth-service.name" . }}
+      app.kubernetes.io/name: {{ include "profile-service.name" . }}
       app.kubernetes.io/instance: {{ .Release.Name }}
   template:
     metadata:
       labels:
-        app.kubernetes.io/name: {{ include "auth-service.name" . }}
+        app.kubernetes.io/name: {{ include "profile-service.name" . }}
         app.kubernetes.io/instance: {{ .Release.Name }}
     spec:
-      serviceAccountName: {{ include "auth-service.serviceAccountName" . }}
+      serviceAccountName: {{ include "profile-service.serviceAccountName" . }}
       containers:
         - name: {{ .Chart.Name }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"

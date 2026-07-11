@@ -11,6 +11,7 @@ KUBERNETES_CA_CERT="${KUBERNETES_CA_CERT:-/var/run/secrets/kubernetes.io/service
 vault secrets enable -path=kv kv-v2 2>/dev/null || true
 
 vault kv put kv/auth-service/config placeholder=true
+vault kv put kv/profile-service/config placeholder=true
 
 vault auth enable kubernetes 2>/dev/null || true
 
