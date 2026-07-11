@@ -2,7 +2,7 @@ replicaCount: 1
 
 image:
   repository: 065320271480.dkr.ecr.ap-southeast-1.amazonaws.com/nexus-profile-service
-  tag: manual-20260711-local
+  tag: manual-20260711-dbfix
   pullPolicy: IfNotPresent
 
 service:
