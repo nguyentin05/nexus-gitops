@@ -13,3 +13,11 @@ path "kv/data/profile-service/*" {
 path "kv/metadata/profile-service/*" {
   capabilities = ["list", "read"]
 }
+
+path "database/creds/auth-service" {
+  capabilities = ["read"]
+}
+
+path "database/creds/profile-service" {
+  capabilities = ["read"]
+}
