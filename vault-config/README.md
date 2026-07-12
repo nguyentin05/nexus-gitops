@@ -35,3 +35,20 @@ Static values such as `JWT_SECRET`, `USER_EVENTS_QUEUE_URL`, `DATABASE_ENDPOINT`
 
 - `kv/auth-service/config`
 - `kv/profile-service/config`
+
+## GitHub Actions sync
+
+The `Sync Vault Secrets` workflow runs the same bootstrap inside `vault-0` and then patches static KV values. Configure these repository secrets in `nexus-gitops`:
+
+- `AWS_ROLE_TO_ASSUME`
+- `VAULT_TOKEN`
+- `NEXUS_DB_ENDPOINT`
+- `NEXUS_DB_ADMIN_USERNAME`
+- `NEXUS_DB_ADMIN_PASSWORD`
+- `USER_EVENTS_QUEUE_URL`
+- `JWT_SECRET`
+- `CLOUDINARY_CLOUD_NAME`
+- `CLOUDINARY_API_KEY`
+- `CLOUDINARY_API_SECRET`
+
+Run it from GitHub Actions with `bootstrap_database=true` after Terraform and ArgoCD are up. It refreshes ESO and restarts `auth-service` and `profile-service`.
