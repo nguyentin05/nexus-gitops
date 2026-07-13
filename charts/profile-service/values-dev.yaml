@@ -2,13 +2,18 @@ replicaCount: 1
 
 image:
   repository: 065320271480.dkr.ecr.ap-southeast-1.amazonaws.com/nexus-profile-service
-  tag: manual-20260711-refactor
+  tag: manual-20260713-metrics-dd7afe8
   pullPolicy: IfNotPresent
 
 service:
   type: ClusterIP
   port: 80
   targetPort: 8000
+
+serviceMonitor:
+  enabled: true
+  path: /metrics
+  interval: 30s
 
 resources:
   requests:

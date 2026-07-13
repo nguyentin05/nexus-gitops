@@ -15,6 +15,11 @@ service:
   port: 80
   targetPort: 8000
 
+serviceMonitor:
+  enabled: false
+  path: /metrics
+  interval: 30s
+
 resources: {}
 
 nodeSelector: {}
