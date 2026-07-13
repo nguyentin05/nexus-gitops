@@ -1,9 +1,15 @@
 fullnameOverride: monitoring
 
+systemTolerations: &systemTolerations
+  - key: CriticalAddonsOnly
+    operator: Exists
+    effect: NoSchedule
+
 alertmanager:
   enabled: true
   alertmanagerSpec:
     retention: 24h
+    tolerations: *systemTolerations
     resources:
       requests:
         cpu: 25m
@@ -22,6 +28,7 @@ grafana:
     enabled: false
   persistence:
     enabled: false
+  tolerations: *systemTolerations
   resources:
     requests:
       cpu: 50m
@@ -42,6 +49,7 @@ prometheus:
     podMonitorSelectorNilUsesHelmValues: false
     probeSelectorNilUsesHelmValues: false
     ruleSelectorNilUsesHelmValues: false
+    tolerations: *systemTolerations
     resources:
       requests:
         cpu: 100m
@@ -52,6 +60,10 @@ prometheus:
 
 prometheusOperator:
   enabled: true
+  tolerations: *systemTolerations
+  admissionWebhooks:
+    patch:
+      tolerations: *systemTolerations
   resources:
     requests:
       cpu: 50m
@@ -76,6 +88,7 @@ coreDns:
   enabled: true
 
 kube-state-metrics:
+  tolerations: *systemTolerations
   resources:
     requests:
       cpu: 25m
