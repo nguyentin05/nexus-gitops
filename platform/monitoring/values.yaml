@@ -53,10 +53,10 @@ prometheus:
     resources:
       requests:
         cpu: 100m
-        memory: 512Mi
+        memory: 256Mi
       limits:
-        cpu: 500m
-        memory: 1Gi
+        cpu: 300m
+        memory: 512Mi
 
 prometheusOperator:
   enabled: true
@@ -96,6 +96,9 @@ kube-state-metrics:
     limits:
       cpu: 100m
       memory: 128Mi
+
+nodeExporter:
+  enabled: false
 
 prometheus-node-exporter:
   tolerations:
