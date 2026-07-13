@@ -1,0 +1,59 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: github-actions-secret-sync
+  namespace: vault
+rules:
+  - apiGroups: [""]
+    resources: ["pods"]
+    verbs: ["get", "list"]
+  - apiGroups: [""]
+    resources: ["pods/exec"]
+    verbs: ["create"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: github-actions-secret-sync
+  namespace: vault
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: github-actions-secret-sync
+subjects:
+  - apiGroup: rbac.authorization.k8s.io
+    kind: Group
+    name: nexus-gitops-secret-sync
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: github-actions-secret-sync
+  namespace: apps
+rules:
+  - apiGroups: ["external-secrets.io"]
+    resources: ["externalsecrets"]
+    verbs: ["get", "list", "watch", "patch", "update"]
+  - apiGroups: ["apps"]
+    resources: ["deployments"]
+    verbs: ["get", "list", "watch", "patch", "update"]
+  - apiGroups: ["apps"]
+    resources: ["replicasets"]
+    verbs: ["get", "list", "watch"]
+  - apiGroups: [""]
+    resources: ["pods"]
+    verbs: ["get", "list", "watch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: github-actions-secret-sync
+  namespace: apps
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: github-actions-secret-sync
+subjects:
+  - apiGroup: rbac.authorization.k8s.io
+    kind: Group
+    name: nexus-gitops-secret-sync
