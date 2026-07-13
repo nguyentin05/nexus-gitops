@@ -7,10 +7,14 @@ config:
 tolerations:
   - operator: Exists
 
+readinessProbe:
+  failureThreshold: 10
+  timeoutSeconds: 5
+
 resources:
   requests:
-    cpu: 25m
+    cpu: 50m
     memory: 64Mi
   limits:
-    cpu: 100m
+    cpu: 200m
     memory: 128Mi
