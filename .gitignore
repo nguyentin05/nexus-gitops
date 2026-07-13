@@ -9,3 +9,5 @@
 
 *.pem
 bootstrap/argocd-github-app-values.yaml
+
+/scripts/

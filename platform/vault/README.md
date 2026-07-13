@@ -10,3 +10,7 @@ Before syncing with ArgoCD, replace:
 - `REPLACE_WITH_PROD_VAULT_KMS_KEY_ID`
 
 Use outputs from `nexus-infra` KMS and IAM modules.
+
+## Vault Policies
+
+Vault policies live under `platform/vault/policies`. Local bootstrap commands are intentionally kept in the ignored root `scripts/` directory and are not part of the GitOps source.
