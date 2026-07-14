@@ -1,0 +1,157 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nexus-service-metrics-dashboard
+  namespace: monitoring
+  labels:
+    grafana_dashboard: "1"
+data:
+  nexus-service-metrics.json: |-
+    {
+      "uid": "nexus-service-metrics",
+      "title": "Nexus Service Metrics",
+      "tags": [
+        "nexus",
+        "apps"
+      ],
+      "timezone": "browser",
+      "schemaVersion": 39,
+      "version": 1,
+      "refresh": "30s",
+      "time": {
+        "from": "now-1h",
+        "to": "now"
+      },
+      "templating": {
+        "list": [
+          {
+            "name": "service",
+            "type": "query",
+            "datasource": {
+              "type": "prometheus",
+              "uid": "prometheus"
+            },
+            "query": "label_values(up{namespace=\"apps\"}, job)",
+            "refresh": 1,
+            "includeAll": true,
+            "multi": true
+          }
+        ]
+      },
+      "panels": [
+        {
+          "type": "stat",
+          "title": "Service Up",
+          "gridPos": {
+            "h": 4,
+            "w": 8,
+            "x": 0,
+            "y": 0
+          },
+          "targets": [
+            {
+              "expr": "min(up{namespace=\"apps\",job=~\"$service\"})"
+            }
+          ]
+        },
+        {
+          "type": "stat",
+          "title": "Scrape Samples",
+          "gridPos": {
+            "h": 4,
+            "w": 8,
+            "x": 8,
+            "y": 0
+          },
+          "targets": [
+            {
+              "expr": "sum(scrape_samples_scraped{namespace=\"apps\",job=~\"$service\"})"
+            }
+          ]
+        },
+        {
+          "type": "stat",
+          "title": "Restarts 1h",
+          "gridPos": {
+            "h": 4,
+            "w": 8,
+            "x": 16,
+            "y": 0
+          },
+          "targets": [
+            {
+              "expr": "sum(increase(kube_pod_container_status_restarts_total{namespace=\"apps\"}[1h]))"
+            }
+          ]
+        },
+        {
+          "type": "timeseries",
+          "title": "App CPU by Pod",
+          "gridPos": {
+            "h": 8,
+            "w": 12,
+            "x": 0,
+            "y": 4
+          },
+          "targets": [
+            {
+              "expr": "sum(rate(container_cpu_usage_seconds_total{namespace=\"apps\",container!=\"\",pod!=\"\"}[5m])) by (pod)",
+              "legendFormat": "{{pod}}"
+            }
+          ]
+        },
+        {
+          "type": "timeseries",
+          "title": "App Memory by Pod",
+          "gridPos": {
+            "h": 8,
+            "w": 12,
+            "x": 12,
+            "y": 4
+          },
+          "fieldConfig": {
+            "defaults": {
+              "unit": "bytes"
+            }
+          },
+          "targets": [
+            {
+              "expr": "sum(container_memory_working_set_bytes{namespace=\"apps\",container!=\"\",pod!=\"\"}) by (pod)",
+              "legendFormat": "{{pod}}"
+            }
+          ]
+        },
+        {
+          "type": "timeseries",
+          "title": "Service Target Health",
+          "gridPos": {
+            "h": 8,
+            "w": 12,
+            "x": 0,
+            "y": 12
+          },
+          "targets": [
+            {
+              "expr": "up{namespace=\"apps\",job=~\"$service\"}",
+              "legendFormat": "{{job}}"
+            }
+          ]
+        },
+        {
+          "type": "timeseries",
+          "title": "Service Scrape Duration",
+          "gridPos": {
+            "h": 8,
+            "w": 12,
+            "x": 12,
+            "y": 12
+          },
+          "targets": [
+            {
+              "expr": "scrape_duration_seconds{namespace=\"apps\",job=~\"$service\"}",
+              "legendFormat": "{{job}}"
+            }
+          ]
+        }
+      ]
+    }
