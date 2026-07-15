@@ -6,6 +6,10 @@ set -eu
 : "${DATABASE_ENDPOINT:?DATABASE_ENDPOINT is required}"
 : "${USER_EVENTS_QUEUE_URL:?USER_EVENTS_QUEUE_URL is required}"
 : "${JWT_SECRET:?JWT_SECRET is required}"
+: "${DISCORD_WEBHOOK_URL:?DISCORD_WEBHOOK_URL is required}"
+
+vault kv put kv/monitoring/alertmanager \
+  DISCORD_WEBHOOK_URL="$DISCORD_WEBHOOK_URL"
 
 vault kv put kv/auth-service/config \
   DATABASE_ENDPOINT="$DATABASE_ENDPOINT" \
