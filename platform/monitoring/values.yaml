@@ -28,6 +28,12 @@ grafana:
     enabled: false
   persistence:
     enabled: false
+  grafana.ini:
+    database:
+      cache_mode: shared
+      wal: true
+      query_retries: 10
+      transaction_retries: 10
   additionalDataSources:
     - name: Loki
       uid: loki
