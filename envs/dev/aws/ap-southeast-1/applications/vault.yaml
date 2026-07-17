@@ -13,7 +13,8 @@ spec:
       targetRevision: 0.30.1
       helm:
         valueFiles:
-          - $values/platform/vault/values-dev.yaml
+          - $values/platform/vault/values.yaml
+          - $values/envs/dev/aws/ap-southeast-1/platform/vault/values.yaml
     - repoURL: https://github.com/nguyentin05/nexus-gitops.git
       targetRevision: main
       ref: values

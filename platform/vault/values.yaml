@@ -1,0 +1,31 @@
+global:
+  enabled: true
+  tlsDisable: true
+
+injector:
+  enabled: false
+
+server:
+  serviceAccount:
+    create: true
+    name: vault
+    serviceDiscovery:
+      enabled: true
+
+  authDelegator:
+    enabled: true
+
+  dataStorage:
+    enabled: true
+
+  ha:
+    enabled: true
+    raft:
+      enabled: true
+      setNodeId: true
+
+serverTelemetry:
+  serviceMonitor:
+    enabled: true
+    interval: 30s
+    scrapeTimeout: 10s
