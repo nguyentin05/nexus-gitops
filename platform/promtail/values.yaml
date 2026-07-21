@@ -10,11 +10,3 @@ tolerations:
 readinessProbe:
   failureThreshold: 10
   timeoutSeconds: 5
-
-resources:
-  requests:
-    cpu: 50m
-    memory: 64Mi
-  limits:
-    cpu: 200m
-    memory: 128Mi
