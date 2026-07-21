@@ -1,0 +1,30 @@
+loki:
+  limits_config:
+    retention_period: 72h
+
+singleBinary:
+  replicas: 1
+  persistence:
+    enabled: true
+    enableStatefulSetAutoDeletePVC: false
+    whenDeleted: Retain
+    whenScaled: Retain
+    storageClass: gp2
+    size: 20Gi
+  resources:
+    requests:
+      cpu: 250m
+      memory: 512Mi
+    limits:
+      cpu: 1
+      memory: 2Gi
+
+gateway:
+  replicas: 2
+  resources:
+    requests:
+      cpu: 50m
+      memory: 64Mi
+    limits:
+      cpu: 200m
+      memory: 256Mi

@@ -14,9 +14,9 @@ spec:
       helm:
         valueFiles:
           - $values/platform/loki/values.yaml
-          - $values/envs/dev/aws/ap-southeast-1/platform/loki/values.yaml
+          - $values/envs/prod/aws/ap-southeast-1/platform/loki/values.yaml
     - repoURL: https://github.com/nguyentin05/nexus-gitops.git
-      targetRevision: main
+      targetRevision: production
       ref: values
   destination:
     server: https://kubernetes.default.svc

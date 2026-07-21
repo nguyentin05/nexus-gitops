@@ -15,30 +15,14 @@ loki:
         index:
           prefix: loki_index_
           period: 24h
-  limits_config:
-    retention_period: 24h
 
 singleBinary:
-  replicas: 1
-  persistence:
-    enabled: false
-  extraVolumes:
-    - name: storage
-      emptyDir: {}
-  extraVolumeMounts:
-    - name: storage
-      mountPath: /var/loki
+  nodeSelector:
+    role: system
   tolerations:
     - key: CriticalAddonsOnly
       operator: Exists
       effect: NoSchedule
-  resources:
-    requests:
-      cpu: 50m
-      memory: 128Mi
-    limits:
-      cpu: 300m
-      memory: 512Mi
 
 read:
   replicas: 0
@@ -51,18 +35,12 @@ backend:
 
 gateway:
   enabled: true
-  replicas: 1
+  nodeSelector:
+    role: system
   tolerations:
     - key: CriticalAddonsOnly
       operator: Exists
       effect: NoSchedule
-  resources:
-    requests:
-      cpu: 10m
-      memory: 32Mi
-    limits:
-      cpu: 100m
-      memory: 128Mi
 
 chunksCache:
   enabled: false
