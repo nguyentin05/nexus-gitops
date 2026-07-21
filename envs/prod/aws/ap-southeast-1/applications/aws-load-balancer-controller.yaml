@@ -15,9 +15,9 @@ spec:
         releaseName: aws-load-balancer-controller
         valueFiles:
           - $values/platform/aws-load-balancer-controller/values.yaml
-          - $values/envs/dev/aws/ap-southeast-1/platform/aws-load-balancer-controller/values.yaml
+          - $values/envs/prod/aws/ap-southeast-1/platform/aws-load-balancer-controller/values.yaml
     - repoURL: https://github.com/nguyentin05/nexus-gitops.git
-      targetRevision: main
+      targetRevision: production
       ref: values
   destination:
     server: https://kubernetes.default.svc

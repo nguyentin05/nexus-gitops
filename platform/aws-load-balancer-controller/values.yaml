@@ -1,23 +1,6 @@
-clusterName: dev-capstone-eks
-region: ap-southeast-1
-
-replicaCount: 1
-
 serviceAccount:
   create: true
   name: aws-load-balancer-controller
-  annotations:
-    eks.amazonaws.com/role-arn: arn:aws:iam::065320271480:role/dev-aws-load-balancer-controller-irsa
-
-# Avoid making this controller the default owner of every Service type LoadBalancer.
-enableServiceMutatorWebhook: false
-
-defaultTargetType: ip
-defaultLoadBalancerScheme: internet-facing
-
-vpcTags:
-  Name: dev-vpc
-  Project: capstone
 
 nodeSelector:
   role: system
@@ -26,3 +9,5 @@ tolerations:
   - key: CriticalAddonsOnly
     operator: Exists
     effect: NoSchedule
+
+enableServiceMutatorWebhook: false
