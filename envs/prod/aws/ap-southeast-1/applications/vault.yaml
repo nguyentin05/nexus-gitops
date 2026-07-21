@@ -1,0 +1,29 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: vault
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+spec:
+  project: default
+  sources:
+    - repoURL: https://helm.releases.hashicorp.com
+      chart: vault
+      targetRevision: 0.30.1
+      helm:
+        valueFiles:
+          - $values/platform/vault/values.yaml
+          - $values/envs/prod/aws/ap-southeast-1/platform/vault/values.yaml
+    - repoURL: https://github.com/nguyentin05/nexus-gitops.git
+      targetRevision: production
+      ref: values
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: vault
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
