@@ -1,49 +1,29 @@
+systemNodeSelector: &systemNodeSelector
+  kubernetes.io/os: linux
+  role: system
+
+systemTolerations: &systemTolerations
+  - key: CriticalAddonsOnly
+    operator: Exists
+    effect: NoSchedule
+
 crds:
   migration:
-    nodeSelector:
-      kubernetes.io/os: linux
-      role: system
-    tolerations:
-      - key: CriticalAddonsOnly
-        operator: Exists
-        effect: NoSchedule
+    nodeSelector: *systemNodeSelector
+    tolerations: *systemTolerations
 
 admissionController:
-  replicas: 1
-  nodeSelector:
-    kubernetes.io/os: linux
-    role: system
-  tolerations:
-    - key: CriticalAddonsOnly
-      operator: Exists
-      effect: NoSchedule
+  nodeSelector: *systemNodeSelector
+  tolerations: *systemTolerations
 
 backgroundController:
-  replicas: 1
-  nodeSelector:
-    kubernetes.io/os: linux
-    role: system
-  tolerations:
-    - key: CriticalAddonsOnly
-      operator: Exists
-      effect: NoSchedule
+  nodeSelector: *systemNodeSelector
+  tolerations: *systemTolerations
 
 cleanupController:
-  replicas: 1
-  nodeSelector:
-    kubernetes.io/os: linux
-    role: system
-  tolerations:
-    - key: CriticalAddonsOnly
-      operator: Exists
-      effect: NoSchedule
+  nodeSelector: *systemNodeSelector
+  tolerations: *systemTolerations
 
 reportsController:
-  replicas: 1
-  nodeSelector:
-    kubernetes.io/os: linux
-    role: system
-  tolerations:
-    - key: CriticalAddonsOnly
-      operator: Exists
-      effect: NoSchedule
+  nodeSelector: *systemNodeSelector
+  tolerations: *systemTolerations
