@@ -1,5 +1,8 @@
 fullnameOverride: monitoring
 
+systemNodeSelector: &systemNodeSelector
+  role: system
+
 systemTolerations: &systemTolerations
   - key: CriticalAddonsOnly
     operator: Exists
@@ -8,27 +11,21 @@ systemTolerations: &systemTolerations
 alertmanager:
   enabled: true
   alertmanagerSpec:
-    retention: 24h
     useExistingSecret: true
     configSecret: alertmanager-monitoring-alertmanager
+    nodeSelector: *systemNodeSelector
     tolerations: *systemTolerations
-    resources:
-      requests:
-        cpu: 25m
-        memory: 64Mi
-      limits:
-        cpu: 100m
-        memory: 128Mi
 
 grafana:
   enabled: true
   defaultDashboardsEnabled: true
   adminPassword: prom-operator
+  serviceAccount:
+    create: true
+    name: monitoring-grafana
   service:
     type: ClusterIP
   ingress:
-    enabled: false
-  persistence:
     enabled: false
   grafana.ini:
     database:
@@ -43,41 +40,35 @@ grafana:
       access: proxy
       url: http://loki-gateway.monitoring.svc.cluster.local
       isDefault: false
+    - name: CloudWatch
+      uid: cloudwatch
+      type: cloudwatch
+      access: proxy
+      jsonData:
+        authType: default
+        defaultRegion: ap-southeast-1
   sidecar:
     dashboards:
       enabled: true
       label: grafana_dashboard
       labelValue: "1"
       searchNamespace: ALL
+  nodeSelector: *systemNodeSelector
   tolerations: *systemTolerations
-  resources:
-    requests:
-      cpu: 250m
-      memory: 256Mi
-    limits:
-      cpu: 500m
-      memory: 512Mi
 
 prometheus:
   enabled: true
   service:
     type: ClusterIP
   prometheusSpec:
-    retention: 6h
     scrapeInterval: 30s
     evaluationInterval: 30s
     serviceMonitorSelectorNilUsesHelmValues: false
     podMonitorSelectorNilUsesHelmValues: false
     probeSelectorNilUsesHelmValues: false
     ruleSelectorNilUsesHelmValues: false
+    nodeSelector: *systemNodeSelector
     tolerations: *systemTolerations
-    resources:
-      requests:
-        cpu: 100m
-        memory: 256Mi
-      limits:
-        cpu: 300m
-        memory: 512Mi
 
 additionalPrometheusRulesMap:
   nexus-platform-alerts:
@@ -125,17 +116,12 @@ additionalPrometheusRulesMap:
 
 prometheusOperator:
   enabled: true
+  nodeSelector: *systemNodeSelector
   tolerations: *systemTolerations
   admissionWebhooks:
     patch:
+      nodeSelector: *systemNodeSelector
       tolerations: *systemTolerations
-  resources:
-    requests:
-      cpu: 50m
-      memory: 128Mi
-    limits:
-      cpu: 200m
-      memory: 256Mi
 
 kubeEtcd:
   enabled: false
@@ -153,25 +139,12 @@ coreDns:
   enabled: true
 
 kube-state-metrics:
+  nodeSelector: *systemNodeSelector
   tolerations: *systemTolerations
-  resources:
-    requests:
-      cpu: 25m
-      memory: 64Mi
-    limits:
-      cpu: 100m
-      memory: 128Mi
 
 nodeExporter:
-  enabled: false
+  enabled: true
 
 prometheus-node-exporter:
   tolerations:
     - operator: Exists
-  resources:
-    requests:
-      cpu: 25m
-      memory: 32Mi
-    limits:
-      cpu: 100m
-      memory: 64Mi
