@@ -12,6 +12,13 @@ server:
     serviceDiscovery:
       enabled: true
 
+  nodeSelector:
+    role: system
+  tolerations:
+    - key: CriticalAddonsOnly
+      operator: Exists
+      effect: NoSchedule
+
   authDelegator:
     enabled: true
 
