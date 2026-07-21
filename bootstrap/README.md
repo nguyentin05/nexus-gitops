@@ -22,6 +22,8 @@ kubectl -n argocd rollout status deployment/argocd-server
 kubectl apply -f bootstrap/gitops-application.yaml
 ```
 
+For a production cluster, apply `bootstrap/gitops-application-prod.yaml` instead. It tracks the `production` branch and the prod environment directory.
+
 ## Validate
 
 ```bash
@@ -44,9 +46,13 @@ kubectl -n argocd get secret argocd-initial-admin-secret \
 - `-1`: namespaces
 - `1`: Vault
 - `2`: External Secrets Operator
-- `3`: ExternalSecret and SecretStore config
-- `4`: Envoy Gateway
-- `5`: Envoy Gateway route config
+- `3`: ExternalSecret, SecretStore, and VaultDynamicSecret config
+- `4`: Kyverno
+- `5`: Kyverno policies
+- `6`: kube-prometheus-stack and AWS Load Balancer Controller
+- `7`: Envoy Gateway, Loki, and OpenTelemetry Collector
+- `8`: application services and Promtail
+- `9`: Gateway API config, TargetGroupBinding, and Grafana dashboards
 
 ## Private GitHub Repository Access
 
