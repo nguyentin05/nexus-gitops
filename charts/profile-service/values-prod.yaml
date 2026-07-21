@@ -1,14 +1,24 @@
 replicaCount: 2
 
 image:
+  repository: 065320271480.dkr.ecr.ap-southeast-1.amazonaws.com/nexus-profile-service
   tag: prod
+  pullPolicy: IfNotPresent
 
+serviceMonitor:
+  enabled: true
 
-env:
-  - name: AWS_REGION
-    value: ap-southeast-1
+resources:
+  requests:
+    cpu: 100m
+    memory: 128Mi
+  limits:
+    cpu: 500m
+    memory: 512Mi
 
-envFrom:
-  - secretRef:
-      name: profile-service-secrets
-      optional: true
+nodeSelector:
+  intent: apps
+
+serviceAccount:
+  annotations:
+    eks.amazonaws.com/role-arn: arn:aws:iam::065320271480:role/prod-profile-service-irsa
