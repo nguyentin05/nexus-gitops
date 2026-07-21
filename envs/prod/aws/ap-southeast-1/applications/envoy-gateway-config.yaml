@@ -9,11 +9,11 @@ spec:
   project: default
   sources:
     - repoURL: https://github.com/nguyentin05/nexus-gitops.git
-      targetRevision: main
+      targetRevision: production
       path: platform/envoy-gateway/manifests
     - repoURL: https://github.com/nguyentin05/nexus-gitops.git
-      targetRevision: main
-      path: envs/dev/aws/ap-southeast-1/platform/envoy-gateway/manifests
+      targetRevision: production
+      path: envs/prod/aws/ap-southeast-1/platform/envoy-gateway/manifests
   destination:
     server: https://kubernetes.default.svc
     namespace: apps
