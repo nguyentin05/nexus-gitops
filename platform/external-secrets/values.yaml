@@ -1,11 +1,3 @@
-installCRDs: true
-replicaCount: 1
-
-serviceAccount:
-  create: true
-  name: external-secrets
-
-# ESO is a platform controller, so it runs on the On-Demand system node group.
 global:
   nodeSelector:
     role: system
@@ -13,3 +5,48 @@ global:
     - key: CriticalAddonsOnly
       operator: Exists
       effect: NoSchedule
+
+installCRDs: true
+
+vault:
+  enableTokenCache: true
+
+serviceAccount:
+  create: true
+  name: external-secrets
+
+resources:
+  requests:
+    cpu: 25m
+    memory: 64Mi
+  limits:
+    cpu: 200m
+    memory: 256Mi
+
+serviceMonitor:
+  enabled: true
+  interval: 30s
+
+livenessProbe:
+  enabled: true
+
+readinessProbe:
+  enabled: true
+
+webhook:
+  resources:
+    requests:
+      cpu: 25m
+      memory: 32Mi
+    limits:
+      cpu: 100m
+      memory: 128Mi
+
+certController:
+  resources:
+    requests:
+      cpu: 25m
+      memory: 32Mi
+    limits:
+      cpu: 100m
+      memory: 128Mi

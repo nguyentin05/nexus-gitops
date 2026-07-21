@@ -1,0 +1,10 @@
+replicaCount: 1
+leaderElect: false
+
+podDisruptionBudget:
+  enabled: false
+
+webhook:
+  replicaCount: 1
+  podDisruptionBudget:
+    enabled: false
