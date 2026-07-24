@@ -168,13 +168,15 @@ jobs:
         uses: aquasecurity/trivy-action@v0.36.0
         with:
           scan-type: config
+          scan-ref: .
           hide-progress: true
-          # format: sarif
-          # output: trivy-results.sarif
           format: table
           output: trivy-results.txt
           exit-code: 1
           severity: CRITICAL,HIGH
+          trivyignores: .trivyignore.yaml
+      #     format: sarif
+      #     output: trivy-results.sarif
       # wait for public repository
       # - name: Upload SARIF file
       #   if: always() && 

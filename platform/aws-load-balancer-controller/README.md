@@ -1,6 +1,7 @@
 # AWS Load Balancer Controller
 
 AWS Load Balancer Controller is installed so Kubernetes can bind workloads to AWS load balancer target groups.
+
 Current dev setup:
 
 - Helm chart: `aws-load-balancer-controller` from `https://aws.github.io/eks-charts`
