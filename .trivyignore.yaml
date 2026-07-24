@@ -1,0 +1,5 @@
+misconfigurations:
+  - id: KSV-0053
+    paths:
+      - platform/external-secrets/manifests/vault/role.yaml
+    statement: GitHub Actions must exec into the Vault StatefulSet to synchronize static secrets.
