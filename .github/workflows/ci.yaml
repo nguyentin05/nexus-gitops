@@ -1,0 +1,77 @@
+name: GitOps CI
+
+on:
+  pull_request:
+    branches: [main, production]
+  push:
+    branches: [main, production]
+
+concurrency:
+  group: gitops-ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  helm-lint:
+    name: Helm lint
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        service: [auth-service, profile-service]
+        environment: [dev, prod]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7.0.1
+
+      - name: Helm tool installer
+        uses: Azure/setup-helm@v5.0.1
+
+      - name: Lint Helm chart
+        run: helm lint "charts/${{ matrix.service }}" --values "charts/${{ matrix.service }}/values-${{ matrix.environment }}.yaml"
+
+  manifest-lint:
+    name: Kubeconform
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7.0.1
+
+      - name: Helm tool installer
+        uses: Azure/setup-helm@v5.0.1
+        
+      - name: Render application charts
+        run: |
+          mkdir -p .rendered
+          helm template auth-service charts/auth-service --values charts/auth-service/values-dev.yaml > .rendered/auth-service.yaml
+          helm template profile-service charts/profile-service --values charts/profile-service/values-dev.yaml > .rendered/profile-service.yaml
+
+      - name: Validate Kubernetes resources
+        run: |
+          mapfile -t files < <(find platform envs .rendered -type f -name '*.yaml' ! -name 'values*.yaml' -print)
+          args=()
+          for file in "${files[@]}"; do
+            args+=("/workdir/${file}")
+          done
+          docker run --rm --volume "$PWD:/workdir:ro" ghcr.io/yannh/kubeconform:v0.8.0-alpine \
+            -summary -strict -ignore-missing-schemas "${args[@]}"
+
+  config-scan:
+    name: Trivy configuration scan
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7.0.1
+
+      - name: Aqua Security Trivy
+        uses: aquasecurity/trivy-action@v0.36.0
+        with:
+          scan-type: config
+          scan-ref: .
+          severity: HIGH,CRITICAL
+          exit-code: 1
