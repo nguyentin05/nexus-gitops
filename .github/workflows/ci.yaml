@@ -1,0 +1,191 @@
+name: GitOps CI
+
+on:
+  pull_request:
+    branches: [main, production]
+  push:
+    branches: [main, production]
+
+concurrency:
+  group: gitops-ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  detect-changes:
+    name: Detect changes
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: read
+    outputs:
+      environment: ${{ steps.environment.outputs.name }}
+      services_changed: ${{ steps.service_matrix.outputs.changed }}
+      service_matrix: ${{ steps.service_matrix.outputs.matrix }}
+      config: ${{ steps.filter.outputs.config }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7.0.1
+        with:
+          fetch-depth: 0
+
+      - name: Paths Changes Filter
+        id: filter
+        uses: dorny/paths-filter@v4.0.2
+        with:
+          list-files: shell
+          filters: |
+            services:
+              - 'charts/*/**'
+            config:
+              - 'bootstrap/**'
+              - 'charts/**'
+              - 'envs/**'
+              - 'namespaces/**'
+              - 'platform/**'
+
+      - name: Select environment
+        id: environment
+        env:
+          TARGET_BRANCH: ${{ github.event_name == 'pull_request' && github.base_ref || github.ref_name }}
+        run: |
+          case "$TARGET_BRANCH" in
+            main) echo 'name=dev' >> "$GITHUB_OUTPUT" ;;
+            production) echo 'name=prod' >> "$GITHUB_OUTPUT" ;;
+            *) echo "Unsupported target branch: $TARGET_BRANCH" >&2; exit 1 ;;
+          esac
+
+      - name: Generate service matrix
+        id: service_matrix
+        env:
+          SERVICE_FILES: ${{ steps.filter.outputs.services_files }}
+        run: |
+          set -euo pipefail
+          declare -A services=()
+          for file in $SERVICE_FILES; do
+            service="${file#charts/}"
+            service="${service%%/*}"
+            if [ -f "charts/$service/Chart.yaml" ]; then
+              services["$service"]=1
+            fi
+          done
+
+          matrix='{"include":[]}'
+          for service in "${!services[@]}"; do
+            matrix="$(jq -c --arg service "$service" '.include += [{service: $service}]' <<< "$matrix")"
+          done
+
+          if [ "$matrix" = '{"include":[]}' ]; then
+            echo 'matrix={"include":[{"service":"noop"}]}' >> "$GITHUB_OUTPUT"
+            echo 'changed=false' >> "$GITHUB_OUTPUT"
+          else
+            echo "matrix=$matrix" >> "$GITHUB_OUTPUT"
+            echo 'changed=true' >> "$GITHUB_OUTPUT"
+          fi
+
+  helm-lint:
+    name: Helm lint (${{ matrix.service }})
+    needs: detect-changes
+    if: needs.detect-changes.outputs.services_changed == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.detect-changes.outputs.service_matrix) }}
+    env:
+      ENVIRONMENT: ${{ needs.detect-changes.outputs.environment }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7.0.1
+
+      - name: Helm tool installer
+        uses: Azure/setup-helm@v5.0.1
+
+      - name: Lint Helm chart
+        run: helm lint "charts/${{ matrix.service }}" --values "charts/${{ matrix.service }}/values-$ENVIRONMENT.yaml"
+
+  manifest-lint:
+    name: Kubeconform
+    needs: detect-changes
+    if: needs.detect-changes.outputs.config == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    env:
+      ENVIRONMENT: ${{ needs.detect-changes.outputs.environment }}
+      SERVICES_CHANGED: ${{ needs.detect-changes.outputs.services_changed }}
+      SERVICE_MATRIX: ${{ needs.detect-changes.outputs.service_matrix }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7.0.1
+
+      - name: Helm tool installer
+        uses: Azure/setup-helm@v5.0.1
+
+      - name: Render changed application charts
+        run: |
+          set -euo pipefail
+          mkdir -p .rendered
+          if [ "$SERVICES_CHANGED" = true ]; then
+            jq -r '.include[].service' <<< "$SERVICE_MATRIX" | while IFS= read -r service; do
+              helm template "$service" "charts/$service" --values "charts/$service/values-$ENVIRONMENT.yaml" > ".rendered/$service.yaml"
+            done
+          fi
+
+      - name: Validate Kubernetes resources
+        run: |
+          set -euo pipefail
+          files=()
+          for directory in bootstrap namespaces platform envs .rendered; do
+            [ -d "$directory" ] || continue
+            while IFS= read -r file; do
+              files+=("$file")
+            done < <(find "$directory" -type f -name '*.yaml' ! -name 'values*.yaml' -print)
+          done
+          args=()
+          for file in "${files[@]}"; do
+            args+=("/workdir/$file")
+          done
+          docker run --rm --volume "$PWD:/workdir:ro" ghcr.io/yannh/kubeconform:v0.8.0-alpine \
+            -summary -strict -ignore-missing-schemas "${args[@]}"
+
+  config-scan:
+    name: Trivy configuration scan
+    needs: detect-changes
+    if: needs.detect-changes.outputs.config == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7.0.1
+      
+      - name: Aqua Security Trivy
+        uses: aquasecurity/trivy-action@v0.36.0
+        with:
+          scan-type: config
+          hide-progress: true
+          # format: sarif
+          # output: trivy-results.sarif
+          format: table
+          output: trivy-results.txt
+          exit-code: 1
+          severity: CRITICAL,HIGH
+      # wait for public repository
+      # - name: Upload SARIF file
+      #   if: always() && 
+      #       hashFiles('trivy-results.sarif') != ''
+      #   uses: github/codeql-action/upload-sarif@v4
+      #   with:
+      #     sarif_file: trivy-results.sarif
+      #     category: trivy-iac
+
+      - name: Write Trivy summary
+        if: always()
+        run: |
+          {
+            echo "## Trivy IaC scan"
+            echo '```text'
+            if [ -f trivy-results.txt ]; then cat trivy-results.txt; else echo "Report unavailable"; fi
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
