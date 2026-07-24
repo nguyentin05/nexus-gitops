@@ -139,16 +139,20 @@ jobs:
           for directory in bootstrap namespaces platform envs .rendered; do
             [ -d "$directory" ] || continue
             while IFS= read -r file; do
-              files+=("$file")
-            done < <(find "$directory" -type f -name '*.yaml' ! -name 'values*.yaml' -print)
+              if rg -q '^apiVersion:' "$file" && rg -q '^kind:' "$file"; then
+                files+=("$file")
+              fi
+            done < <(find "$directory" -type f -name '*.yaml' -print)
           done
+          if [ "${#files[@]}" -eq 0 ]; then
+            echo "No Kubernetes resources to validate"
+            exit 0
+          fi
           args=()
           for file in "${files[@]}"; do
             args+=("/workdir/$file")
           done
-          docker run --rm --volume "$PWD:/workdir:ro" ghcr.io/yannh/kubeconform:v0.8.0-alpine \
-            -summary -strict -ignore-missing-schemas "${args[@]}"
-
+          docker run --rm --volume "$PWD:/workdir:ro" ghcr.io/yannh/kubeconform:v0.8.0-alpine -summary -strict -ignore-missing-schemas "${args[@]}"
   config-scan:
     name: Trivy configuration scan
     needs: detect-changes
@@ -159,7 +163,7 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v7.0.1
-      
+
       - name: Aqua Security Trivy
         uses: aquasecurity/trivy-action@v0.36.0
         with:
