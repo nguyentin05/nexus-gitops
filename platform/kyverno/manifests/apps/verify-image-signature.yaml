@@ -1,0 +1,34 @@
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: verify-nexus-image-signatures
+spec:
+  admission: true
+  validationFailureAction: Audit
+  background: true
+  rules:
+    - name: verify-nexus-images
+      match:
+        any:
+          - resources:
+              kinds:
+                - Pod
+              namespaces:
+                - apps
+      verifyImages:
+        - imageReferences:
+            - "065320271480.dkr.ecr.ap-southeast-1.amazonaws.com/nexus-auth-service:*"
+            - "065320271480.dkr.ecr.ap-southeast-1.amazonaws.com/nexus-profile-service:*"
+          mutateDigest: true
+          verifyDigest: true
+          required: true
+          imageRegistryCredentials:
+            helpers:
+              - amazon
+          attestors:
+            - entries:
+                - keyless:
+                    subject: "https://github.com/nguyentin05/nexus-app/.github/workflows/release.yml@refs/heads/main"
+                    issuer: "https://token.actions.githubusercontent.com"
+                    rekor:
+                      url: https://rekor.sigstore.dev
