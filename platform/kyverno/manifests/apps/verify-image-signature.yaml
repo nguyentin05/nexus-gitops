@@ -18,7 +18,7 @@ spec:
               namespaces:
                 - apps
       verifyImages:
-        - cosignOCI11: true
+        - type: SigstoreBundle
           imageReferences:
             - "065320271480.dkr.ecr.ap-southeast-1.amazonaws.com/nexus-auth-service:*"
             - "065320271480.dkr.ecr.ap-southeast-1.amazonaws.com/nexus-profile-service:*"
@@ -29,11 +29,13 @@ spec:
           imageRegistryCredentials:
             providers:
               - amazon
-          attestors:
-            - entries:
-                - keyless:
-                    subject: "https://github.com/nguyentin05/nexus-app/.github/workflows/cd.yml@refs/heads/main"
-                    issuer: "https://token.actions.githubusercontent.com"
-                    rekor:
-                      url: https://rekor.sigstore.dev
-                  signatureAlgorithm: sha256
+          attestations:
+            - type: https://sigstore.dev/cosign/sign/v1
+              attestors:
+                - entries:
+                    - keyless:
+                        subject: "https://github.com/nguyentin05/nexus-app/.github/workflows/cd.yml@refs/heads/main"
+                        issuer: "https://token.actions.githubusercontent.com"
+                        rekor:
+                          url: https://rekor.sigstore.dev
+                      signatureAlgorithm: sha256
