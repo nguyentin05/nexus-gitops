@@ -18,7 +18,8 @@ spec:
               namespaces:
                 - apps
       verifyImages:
-        - imageReferences:
+        - cosignOCI11: true
+          imageReferences:
             - "065320271480.dkr.ecr.ap-southeast-1.amazonaws.com/nexus-auth-service:*"
             - "065320271480.dkr.ecr.ap-southeast-1.amazonaws.com/nexus-profile-service:*"
           mutateDigest: true
