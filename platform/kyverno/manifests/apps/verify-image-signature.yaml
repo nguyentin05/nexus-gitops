@@ -4,7 +4,7 @@ metadata:
   name: verify-nexus-image-signatures
 spec:
   admission: true
-  validationFailureAction: Audit
+  validationFailureAction: Enforce
   background: true
   rules:
     - name: verify-nexus-images
@@ -28,7 +28,7 @@ spec:
           attestors:
             - entries:
                 - keyless:
-                    subject: "https://github.com/nguyentin05/nexus-app/.github/workflows/release.yml@refs/heads/main"
+                    subject: "https://github.com/nguyentin05/nexus-app/.github/workflows/cd.yml@refs/heads/main"
                     issuer: "https://token.actions.githubusercontent.com"
                     rekor:
                       url: https://rekor.sigstore.dev
