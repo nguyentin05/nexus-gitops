@@ -23,7 +23,7 @@ spec:
           verifyDigest: true
           required: true
           imageRegistryCredentials:
-            helpers:
+            providers:
               - amazon
           attestors:
             - entries:
