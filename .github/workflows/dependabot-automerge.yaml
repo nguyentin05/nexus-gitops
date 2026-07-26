@@ -24,7 +24,7 @@ jobs:
       - name: Enable auto-merge for patch updates
         if: steps.metadata.outputs.update-type == 'version-update:semver-patch'
         env:
-          GITHUB_TOKEN: ${{ secrets.NEXUS_CICD_BOT_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PR_TITLE: ${{ github.event.pull_request.title }}
           PR_URL: ${{ github.event.pull_request.html_url }}
         run: gh pr merge --auto --squash --subject "$PR_TITLE" --body "Automated patch dependency update." "$PR_URL"

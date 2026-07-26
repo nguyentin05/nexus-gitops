@@ -1,0 +1,153 @@
+name: DAST
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "charts/*/values-dev.yaml"
+  workflow_dispatch:
+
+jobs:
+  detect-services:
+    name: Detect updated services
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    outputs:
+      matrix: ${{ steps.services.outputs.matrix }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7.0.1
+        with:
+          fetch-depth: 2
+
+      - name: Generate service matrix
+        id: services
+        env:
+          BEFORE_SHA: ${{ github.event.before }}
+          EVENT_NAME: ${{ github.event_name }}
+        run: |
+          set -euo pipefail
+          if [ "$EVENT_NAME" = workflow_dispatch ]; then
+            files="$(find charts -mindepth 2 -maxdepth 2 -name values-dev.yaml -print)"
+          else
+            files="$(git diff --name-only "$BEFORE_SHA" "$GITHUB_SHA" -- 'charts/*/values-dev.yaml')"
+          fi
+
+          matrix='{"include":[]}'
+          while IFS= read -r file; do
+            [ -n "$file" ] || continue
+            service="${file#charts/}"
+            service="${service%%/*}"
+            route="${service%-service}"
+            matrix="$(jq -c \
+              --arg service "$service" \
+              --arg route "$route" \
+              '.include += [{service: $service, route: $route}]' \
+              <<< "$matrix")"
+          done <<< "$files"
+
+          test "$matrix" != '{"include":[]}'
+          echo "matrix=$matrix" >> "$GITHUB_OUTPUT"
+
+  validate-development:
+    name: Validate development (${{ matrix.service }})
+    needs: detect-services
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    concurrency:
+      group: development-dast-${{ matrix.service }}
+      cancel-in-progress: true
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.detect-services.outputs.matrix) }}
+    env:
+      AWS_REGION: ap-southeast-1
+      EKS_CLUSTER_NAME: dev-capstone-eks
+      SERVICE: ${{ matrix.service }}
+      API_BASE_URL: https://api.tin-nexus.com/${{ matrix.route }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7.0.1
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v6.2.3
+        with:
+          aws-region: ${{ env.AWS_REGION }}
+          role-to-assume: ${{ secrets.AWS_GITOPS_ROLE_ARN }}
+          role-session-name: nexus-gitops-dast
+
+      - name: Update kubeconfig
+        run: aws eks update-kubeconfig --region "$AWS_REGION" --name "$EKS_CLUSTER_NAME"
+
+      - name: Resolve expected image
+        id: image
+        uses: mikefarah/yq@v4.53.3
+        with:
+          cmd: yq '.image.repository + ":" + .image.tag' charts/${{ matrix.service }}/values-dev.yaml
+
+      - name: Wait for expected image
+        env:
+          EXPECTED_IMAGE: ${{ steps.image.outputs.result }}
+        run: |
+          set -euo pipefail
+          for attempt in {1..60}; do
+            current_image="$(kubectl -n apps get deployment "$SERVICE" -o jsonpath='{.spec.template.spec.containers[0].image}' 2>/dev/null || true)"
+            if [ "$current_image" = "$EXPECTED_IMAGE" ]; then
+              break
+            fi
+            if [ "$attempt" -eq 60 ]; then
+              echo "::error::Timed out waiting for $SERVICE to use $EXPECTED_IMAGE; current image is $current_image"
+              exit 1
+            fi
+            sleep 10
+          done
+
+          kubectl -n apps rollout status "deployment/$SERVICE" --timeout=5m
+
+      - name: Check public health endpoint
+        run: curl --fail --show-error --silent --retry 12 --retry-all-errors --retry-delay 5 "$API_BASE_URL/health"
+
+      - name: Prepare OpenAPI definition
+        run: |
+          curl --fail --show-error --silent "$API_BASE_URL/openapi.json" | \
+          jq --arg url "$API_BASE_URL" '.servers = [{url: $url}]' \
+          > openapi.json
+
+      - name: ZAP API Scan
+        uses: zaproxy/action-api-scan@v0.10.0
+        with:
+          target: /zap/wrk/openapi.json
+          format: openapi
+          docker_name: ghcr.io/zaproxy/zaproxy:2.17.0
+          cmd_options: -S
+          fail_action: true
+          allow_issue_writing: false
+          artifact_name: zap-api-scan-${{ matrix.service }}
+
+      - name: Reject stale validation
+        env:
+          EXPECTED_IMAGE: ${{ steps.image.outputs.result }}
+        run: |
+          set -euo pipefail
+          current_image="$(kubectl -n apps get deployment "$SERVICE" -o jsonpath='{.spec.template.spec.containers[0].image}')"
+          if [ "$current_image" != "$EXPECTED_IMAGE" ]; then
+            echo "::error::$SERVICE changed from $EXPECTED_IMAGE to $current_image during DAST"
+            exit 1
+          fi
+          kubectl -n apps rollout status "deployment/$SERVICE" --timeout=60s
+          curl --fail --show-error --silent "$API_BASE_URL/health"
+
+  promote-production:
+    name: Prepare production promotion
+    needs: [detect-services, validate-development]
+    permissions:
+      contents: write
+      pull-requests: write
+    uses: ./.github/workflows/promote-production.yaml
+    with:
+      service_matrix: ${{ needs.detect-services.outputs.matrix }}
+      source_revision: ${{ github.sha }}
+    secrets: inherit
