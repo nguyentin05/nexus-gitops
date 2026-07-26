@@ -24,7 +24,7 @@ spec:
             - "065320271480.dkr.ecr.ap-southeast-1.amazonaws.com/nexus-profile-service:*"
           mutateDigest: false
           useCache: true
-          verifyDigest: true
+          verifyDigest: false
           required: true
           imageRegistryCredentials:
             providers:
