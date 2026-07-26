@@ -37,6 +37,9 @@ spec:
           volumeMounts:
             - name: tmp
               mountPath: /tmp
+            - name: app-secrets
+              mountPath: /var/run/secrets/nexus
+              readOnly: true
           ports:
             - name: http
               containerPort: {{ .Values.service.targetPort }}
@@ -68,6 +71,10 @@ spec:
       volumes:
         - name: tmp
           emptyDir: {}
+        - name: app-secrets
+          secret:
+            secretName: {{ include "profile-service.fullname" . }}-secrets
+            optional: true
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
