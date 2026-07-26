@@ -22,7 +22,7 @@ spec:
           imageReferences:
             - "065320271480.dkr.ecr.ap-southeast-1.amazonaws.com/nexus-auth-service:*"
             - "065320271480.dkr.ecr.ap-southeast-1.amazonaws.com/nexus-profile-service:*"
-          mutateDigest: true
+          mutateDigest: false
           useCache: true
           verifyDigest: true
           required: true
