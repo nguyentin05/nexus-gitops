@@ -76,7 +76,7 @@ jobs:
         uses: aws-actions/configure-aws-credentials@v6.2.3
         with:
           aws-region: ${{ env.AWS_REGION }}
-          role-to-assume: ${{ secrets.AWS_GITOPS_ROLE_ARN }}
+          role-to-assume: ${{ secrets.AWS_ECR_ROLE_ARN }}
           role-session-name: nexus-gitops-dast
 
       - name: Update kubeconfig
