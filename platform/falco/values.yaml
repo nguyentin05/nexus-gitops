@@ -1,0 +1,99 @@
+driver:
+  kind: modern_ebpf
+  modernEbpf:
+    leastPrivileged: true
+
+controller:
+  kind: daemonset
+
+nodeSelector:
+  kubernetes.io/os: linux
+
+tolerations:
+  - operator: Exists
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 256Mi
+  limits:
+    cpu: 500m
+    memory: 768Mi
+
+metrics:
+  enabled: true
+  interval: 30s
+  rulesCountersEnabled: true
+  resourceUtilizationEnabled: true
+
+serviceMonitor:
+  create: true
+
+falco:
+  priority: warning
+  time_format_iso_8601: true
+  json_output: true
+
+falcoctl:
+  artifact:
+    follow:
+      enabled: false
+
+falcosidekick:
+  enabled: true
+  replicaCount: 2
+  resources:
+    requests:
+      cpu: 25m
+      memory: 32Mi
+    limits:
+      cpu: 100m
+      memory: 128Mi
+  serviceMonitor:
+    enabled: true
+  config:
+    alertmanager:
+      hostport: http://monitoring-alertmanager.monitoring.svc.cluster.local:9093
+      endpoint: /api/v2/alerts
+      minimumpriority: warning
+      expireafter: "300"
+      extralabels: source:falco,namespace:falco
+
+customRules:
+  nexus-rules.yaml: |-
+    - rule: Nexus shell spawned in application container
+      desc: Detect interactive shell utilities started in Nexus application containers
+      condition: >
+        spawned_process and container and k8s.ns.name = apps
+        and proc.name in (bash, sh, ash, dash, zsh)
+      output: >
+        Shell spawned in application container
+        (user=%user.name command=%proc.cmdline container=%container.name
+        pod=%k8s.pod.name namespace=%k8s.ns.name)
+      priority: WARNING
+      tags: [container, kubernetes, nexus, mitre_execution]
+
+    - rule: Nexus secret files read by interactive utility
+      desc: Detect interactive utilities reading mounted Nexus application secrets
+      condition: >
+        open_read and container and k8s.ns.name = apps
+        and fd.name startswith /var/run/secrets/nexus/
+        and proc.name in (cat, less, more, head, tail, grep, strings)
+      output: >
+        Secret file read by interactive utility
+        (user=%user.name command=%proc.cmdline file=%fd.name
+        container=%container.name pod=%k8s.pod.name namespace=%k8s.ns.name)
+      priority: WARNING
+      tags: [container, kubernetes, nexus, secrets, mitre_credential_access]
+
+    - rule: Nexus outbound connection from network utility
+      desc: Detect network utilities opening outbound connections from Nexus application containers
+      condition: >
+        evt.type = connect and container and k8s.ns.name = apps
+        and proc.name in (curl, wget, nc, ncat, netcat, socat)
+      output: >
+        Network utility opened an outbound connection
+        (user=%user.name command=%proc.cmdline connection=%fd.name
+        container=%container.name pod=%k8s.pod.name namespace=%k8s.ns.name)
+      priority: WARNING
+      tags: [container, network, kubernetes, nexus, mitre_command_and_control]

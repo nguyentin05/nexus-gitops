@@ -1,0 +1,6 @@
+podLabels:
+  environment: dev
+
+falcosidekick:
+  podLabels:
+    environment: dev
