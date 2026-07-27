@@ -135,7 +135,7 @@ jobs:
           pr_url="$(gh pr list --base production --head "$PROMOTION_BRANCH" --state open --json url --jq '.[0].url // empty')"
 
           if [ -z "$pr_url" ]; then
-            gh pr create --base production --head "$PROMOTION_BRANCH" --title "$title" --body "$body"
+            gh pr create --base production --head "$PROMOTION_BRANCH" --title "$title" --body "$body" --reviewer "$REPO_OWNER"
           else
             gh pr edit "$pr_url" --title "$title" --body "$body"
             if [ "$CHANGED" = true ]; then
