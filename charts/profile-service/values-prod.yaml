@@ -1,7 +1,7 @@
 replicaCount: 2
 image:
   repository: 065320271480.dkr.ecr.ap-southeast-1.amazonaws.com/nexus-profile-service
-  tag: v0.1.5
+  tag: v0.1.6
   pullPolicy: IfNotPresent
 serviceMonitor:
   enabled: true
