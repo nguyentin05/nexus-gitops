@@ -1,6 +1,6 @@
 resources:
   requests:
-    memory: 48Mi
+    memory: 16Mi
 
 podLabels:
   environment: dev
