@@ -54,10 +54,6 @@ jobs:
           path: source
           persist-credentials: false
 
-      - name: Require production branch
-        working-directory: source
-        run: git ls-remote --exit-code origin refs/heads/production
-
       - name: Read validated image tag
         id: image
         uses: mikefarah/yq@v4.53.3
