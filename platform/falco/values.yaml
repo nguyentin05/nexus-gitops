@@ -42,6 +42,12 @@ falcoctl:
 falcosidekick:
   enabled: true
   replicaCount: 2
+  nodeSelector:
+    role: system
+  tolerations:
+    - key: CriticalAddonsOnly
+      operator: Exists
+      effect: NoSchedule
   resources:
     requests:
       cpu: 25m
