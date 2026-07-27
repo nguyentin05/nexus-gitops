@@ -1,15 +1,46 @@
-apiVersion: apps/v1
-kind: Deployment
+apiVersion: argoproj.io/v1alpha1
+kind: Rollout
 metadata:
   name: {{ include "profile-service.fullname" . }}
   labels:
     {{- include "profile-service.labels" . | nindent 4 }}
 spec:
   replicas: {{ .Values.replicaCount }}
+  revisionHistoryLimit: 2
   selector:
     matchLabels:
       app.kubernetes.io/name: {{ include "profile-service.name" . }}
       app.kubernetes.io/instance: {{ .Release.Name }}
+  strategy:
+    canary:
+      stableService: {{ include "profile-service.fullname" . }}
+      canaryService: {{ include "profile-service.fullname" . }}-canary
+      maxSurge: 1
+      maxUnavailable: 0
+      trafficRouting:
+        plugins:
+          argoproj-labs/gatewayAPI:
+            httpRoute: profile-service
+            namespace: {{ .Release.Namespace }}
+      steps:
+        - setWeight: 10
+        - pause:
+            duration: 2m
+        - analysis:
+            templates:
+              - templateName: {{ include "profile-service.fullname" . }}-slo
+            args:
+              - name: service-name
+                value: {{ include "profile-service.fullname" . }}-canary
+        - setWeight: 50
+        - pause:
+            duration: 5m
+        - analysis:
+            templates:
+              - templateName: {{ include "profile-service.fullname" . }}-slo
+            args:
+              - name: service-name
+                value: {{ include "profile-service.fullname" . }}-canary
   template:
     metadata:
       labels:

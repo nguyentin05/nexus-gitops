@@ -1,0 +1,59 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AnalysisTemplate
+metadata:
+  name: {{ include "auth-service.fullname" . }}-slo
+  labels:
+    {{- include "auth-service.labels" . | nindent 4 }}
+spec:
+  args:
+    - name: service-name
+  metrics:
+    - name: error-rate
+      interval: 20s
+      count: 3
+      failureLimit: 1
+      successCondition: result[0] < 0.05
+      provider:
+        prometheus:
+          address: http://monitoring-prometheus.monitoring.svc.cluster.local:9090
+          query: |
+            (
+              sum(rate(nexus_http_requests_total{
+                namespace="apps",
+                service="{{`{{args.service-name}}`}}",
+                status=~"5.."
+              }[2m])) or vector(0)
+            )
+            /
+            clamp_min(
+              sum(rate(nexus_http_requests_total{
+                namespace="apps",
+                service="{{`{{args.service-name}}`}}"
+              }[2m])) or vector(0),
+              0.001
+            )
+    - name: p99-latency
+      interval: 20s
+      count: 3
+      failureLimit: 1
+      successCondition: result[0] < 0.5
+      provider:
+        prometheus:
+          address: http://monitoring-prometheus.monitoring.svc.cluster.local:9090
+          query: |
+            (
+              histogram_quantile(
+                0.99,
+                sum by (le) (
+                  rate(nexus_http_request_duration_seconds_bucket{
+                    namespace="apps",
+                    service="{{`{{args.service-name}}`}}"
+                  }[2m])
+                )
+              )
+              and on()
+              sum(rate(nexus_http_request_duration_seconds_count{
+                namespace="apps",
+                service="{{`{{args.service-name}}`}}"
+              }[2m])) > 0
+            ) or vector(0)

@@ -1,7 +1,7 @@
 apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
 metadata:
-  name: app-services
+  name: auth-service
   namespace: apps
 spec:
   parentRefs:
@@ -20,6 +20,20 @@ spec:
       backendRefs:
         - name: auth-service
           port: 80
+          weight: 100
+        - name: auth-service-canary
+          port: 80
+          weight: 0
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: profile-service
+  namespace: apps
+spec:
+  parentRefs:
+    - name: public-gateway
+  rules:
     - matches:
         - path:
             type: PathPrefix
@@ -33,3 +47,7 @@ spec:
       backendRefs:
         - name: profile-service
           port: 80
+          weight: 100
+        - name: profile-service-canary
+          port: 80
+          weight: 0
