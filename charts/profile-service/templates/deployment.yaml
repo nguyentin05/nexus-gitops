@@ -1,0 +1,16 @@
+{{- if not .Values.rollout.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "profile-service.fullname" . }}
+  labels:
+    {{- include "profile-service.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  revisionHistoryLimit: 2
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "profile-service.name" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+{{ include "profile-service.podTemplate" . | nindent 2 }}
+{{- end }}

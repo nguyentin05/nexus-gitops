@@ -1,3 +1,4 @@
+{{- if .Values.rollout.enabled }}
 apiVersion: argoproj.io/v1alpha1
 kind: AnalysisTemplate
 metadata:
@@ -57,3 +58,4 @@ spec:
                 service="{{`{{args.service-name}}`}}"
               }[2m])) > 0
             ) or vector(0)
+{{- end }}

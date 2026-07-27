@@ -1,0 +1,16 @@
+{{- if not .Values.rollout.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "auth-service.fullname" . }}
+  labels:
+    {{- include "auth-service.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  revisionHistoryLimit: 2
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "auth-service.name" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+{{ include "auth-service.podTemplate" . | nindent 2 }}
+{{- end }}

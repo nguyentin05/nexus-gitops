@@ -1,4 +1,6 @@
 replicaCount: 1
+rollout:
+  enabled: false
 
 image:
   repository: ghcr.io/nguyentin05/nexus-profile-service
