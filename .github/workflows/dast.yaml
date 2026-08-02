@@ -65,7 +65,7 @@ jobs:
       matrix: ${{ fromJSON(needs.detect-services.outputs.matrix) }}
     env:
       AWS_REGION: ap-southeast-1
-      EKS_CLUSTER_NAME: dev-capstone-eks
+      EKS_CLUSTER_NAME: dev-major-eks
       SERVICE: ${{ matrix.service }}
       API_BASE_URL: https://api.tin-nexus.com/${{ matrix.route }}
     steps:
