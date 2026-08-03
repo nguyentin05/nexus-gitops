@@ -1,0 +1,10 @@
+resources:
+  requests:
+    memory: 16Mi
+
+podLabels:
+  environment: prod
+
+falcosidekick:
+  podLabels:
+    environment: prod
