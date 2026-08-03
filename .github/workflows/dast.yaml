@@ -112,9 +112,11 @@ jobs:
 
       - name: Prepare OpenAPI definition
         run: |
-          curl --fail --show-error --silent "$API_BASE_URL/openapi.json" | \
-          jq --arg url "$API_BASE_URL" '.servers = [{url: $url}]' \
-          > openapi.json
+          set -euo pipefail
+          curl --fail --show-error --silent --retry 12 --retry-all-errors --retry-delay 5 \
+            --output openapi.source.json "$API_BASE_URL/openapi.json"
+          jq --exit-status --arg url "$API_BASE_URL" \
+            'select(.openapi and (.paths | type == "object") and (.paths | length > 0)) | .servers = [{url: $url}]' openapi.source.json > openapi.json
 
       - name: ZAP API Scan
         uses: zaproxy/action-api-scan@v0.10.0
