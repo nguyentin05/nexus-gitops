@@ -1,12 +1,12 @@
 apiVersion: elbv2.k8s.aws/v1beta1
 kind: TargetGroupBinding
 metadata:
-  name: public-alb-envoy
+  name: public-nlb-envoy
   namespace: envoy-gateway
   annotations:
     argocd.argoproj.io/sync-wave: "1"
 spec:
-  targetGroupName: prod-envoy-gateway
+  targetGroupName: prod-envoy-gateway-nlb
   targetType: ip
   serviceRef:
     name: envoy-public-gateway
