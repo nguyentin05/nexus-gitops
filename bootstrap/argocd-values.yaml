@@ -20,6 +20,18 @@ server:
 
 controller:
   replicas: 1
+  resources:
+    requests:
+      cpu: 250m
+      memory: 1Gi
+    limits:
+      cpu: "1"
+      memory: 1Gi
+  env:
+    - name: ARGOCD_CONTROLLER_STATUS_PROCESSORS
+      value: "5"
+    - name: ARGOCD_CONTROLLER_OPERATION_PROCESSORS
+      value: "2"
 
 repoServer:
   replicas: 1
