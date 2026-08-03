@@ -19,11 +19,7 @@ resources:
     cpu: 100m
     memory: 128Mi
 nodeSelector:
-  role: system
-tolerations:
-  - key: CriticalAddonsOnly
-    operator: Exists
-    effect: NoSchedule
+  intent: apps
 env:
   - name: AWS_REGION
     value: ap-southeast-1
