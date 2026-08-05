@@ -11,3 +11,7 @@
 bootstrap/argocd-github-app-values.yaml
 
 /scripts/
+
+AGENTS.md
+/platform/**/*.md
+/bootstrap/README.md
