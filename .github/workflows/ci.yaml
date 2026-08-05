@@ -170,28 +170,17 @@ jobs:
           scan-type: config
           scan-ref: .
           hide-progress: true
-          format: table
-          output: trivy-results.txt
           exit-code: 1
           severity: CRITICAL,HIGH
           trivyignores: .trivyignore.yaml
-      #     format: sarif
-      #     output: trivy-results.sarif
-      # wait for public repository
-      # - name: Upload SARIF file
-      #   if: always() && 
-      #       hashFiles('trivy-results.sarif') != ''
-      #   uses: github/codeql-action/upload-sarif@v4
-      #   with:
-      #     sarif_file: trivy-results.sarif
-      #     category: trivy-iac
+          format: sarif
+          output: trivy-results.sarif
+          limit-severities-for-sarif: true
 
-      - name: Write Trivy summary
-        if: always()
-        run: |
-          {
-            echo "## Trivy IaC scan"
-            echo '```text'
-            if [ -f trivy-results.txt ]; then cat trivy-results.txt; else echo "Report unavailable"; fi
-            echo '```'
-          } >> "$GITHUB_STEP_SUMMARY"
+      - name: Upload SARIF file
+        if: always() && 
+            hashFiles('trivy-results.sarif') != ''
+        uses: github/codeql-action/upload-sarif@v4
+        with:
+          sarif_file: trivy-results.sarif
+          category: trivy-iac
