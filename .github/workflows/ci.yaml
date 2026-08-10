@@ -30,7 +30,7 @@ jobs:
 
       - name: Paths Changes Filter
         id: filter
-        uses: dorny/paths-filter@v4.0.2
+        uses: dorny/paths-filter@v4.0.3
         with:
           list-files: shell
           filters: |
