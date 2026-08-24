@@ -97,14 +97,14 @@ additionalPrometheusRulesMap:
               description: "{{ $labels.node }} has sustained memory usage above 90% for 5 minutes."
           - alert: NexusServiceHigh5xxRate
             expr: |
-              100 * sum by (namespace, job) (rate(nexus_http_requests_total{namespace="apps",status=~"5.."}[5m]))
-              / sum by (namespace, job) (rate(nexus_http_requests_total{namespace="apps"}[5m])) > 5
+              100 * sum by (namespace, service) (rate(nexus_http_requests_total{namespace="apps",status=~"5.."}[5m]))
+              / sum by (namespace, service) (rate(nexus_http_requests_total{namespace="apps"}[5m])) > 5
             for: 5m
             labels:
               severity: critical
             annotations:
               summary: "Service 5xx rate is above 5%"
-              description: "{{ $labels.job }} in {{ $labels.namespace }} has a 5xx rate above 5% for 5 minutes."
+              description: "{{ $labels.service }} in {{ $labels.namespace }} has a 5xx rate above 5% for 5 minutes."
           - alert: NexusPodFrequentRestarts
             expr: sum by (namespace, pod, container) (increase(kube_pod_container_status_restarts_total{namespace="apps"}[15m])) > 3
             for: 5m

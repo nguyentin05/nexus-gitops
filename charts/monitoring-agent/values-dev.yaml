@@ -1,0 +1,15 @@
+image:
+  repository: 065320271480.dkr.ecr.ap-southeast-1.amazonaws.com/nexus-monitoring-agent
+  tag: bootstrap-v0.1.0
+
+serviceAccount:
+  annotations:
+    eks.amazonaws.com/role-arn: arn:aws:iam::065320271480:role/dev-monitoring-agent-irsa
+
+nodeSelector:
+  role: system
+
+tolerations:
+  - key: CriticalAddonsOnly
+    operator: Exists
+    effect: NoSchedule
