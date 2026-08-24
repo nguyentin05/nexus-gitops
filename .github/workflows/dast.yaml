@@ -84,7 +84,7 @@ jobs:
 
       - name: Resolve expected image
         id: image
-        uses: mikefarah/yq@v4.53.3
+        uses: mikefarah/yq@v4.53.6
         with:
           cmd: yq '.image.repository + ":" + .image.tag' charts/${{ matrix.service }}/values-dev.yaml
 
