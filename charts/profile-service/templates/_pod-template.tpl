@@ -33,10 +33,32 @@ template:
           - name: http
             containerPort: {{ .Values.service.targetPort }}
             protocol: TCP
-        {{- with .Values.env }}
         env:
-          {{- toYaml . | nindent 12 }}
-        {{- end }}
+          {{- if .Values.telemetry.enabled }}
+          - name: OTEL_SERVICE_NAME
+            value: {{ .Chart.Name | quote }}
+          - name: OTEL_EXPORTER_OTLP_ENDPOINT
+            value: {{ .Values.telemetry.endpoint | quote }}
+          - name: OTEL_EXPORTER_OTLP_PROTOCOL
+            value: http/protobuf
+          - name: OTEL_METRICS_EXPORTER
+            value: otlp
+          - name: OTEL_TRACES_EXPORTER
+            value: otlp
+          - name: OTEL_LOGS_EXPORTER
+            value: none
+          - name: OTEL_TRACES_SAMPLER
+            value: {{ .Values.telemetry.tracesSampler | quote }}
+          - name: OTEL_TRACES_SAMPLER_ARG
+            value: {{ .Values.telemetry.tracesSamplerArg | quote }}
+          - name: OTEL_METRIC_EXPORT_INTERVAL
+            value: {{ .Values.telemetry.metricExportInterval | quote }}
+          - name: OTEL_RESOURCE_ATTRIBUTES
+            value: {{ printf "deployment.environment.name=%s" .Values.telemetry.environment | quote }}
+          {{- end }}
+          {{- with .Values.env }}
+          {{- toYaml . | nindent 10 }}
+          {{- end }}
         {{- with .Values.envFrom }}
         envFrom:
           {{- toYaml . | nindent 12 }}

@@ -25,3 +25,7 @@ nodeSelector:
 serviceAccount:
   annotations:
     eks.amazonaws.com/role-arn: arn:aws:iam::065320271480:role/prod-auth-service-irsa
+
+telemetry:
+  environment: prod
+  tracesSamplerArg: "0.1"
