@@ -5,3 +5,4 @@ resources:
   limits:
     cpu: 500m
     memory: 512Mi
+replicaCount: 2

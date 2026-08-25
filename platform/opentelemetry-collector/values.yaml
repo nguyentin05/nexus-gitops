@@ -1,14 +1,31 @@
 fullnameOverride: opentelemetry-collector
-
-mode: daemonset
-
+mode: deployment
+replicaCount: 1
 image:
   repository: otel/opentelemetry-collector-contrib
-
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 10001
+  runAsGroup: 10001
+  fsGroup: 10001
+securityContext:
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+      - ALL
+  readOnlyRootFilesystem: true
+clusterRole:
+  create: true
+  rules:
+    - apiGroups: [""]
+      resources: ["namespaces", "nodes", "pods"]
+      verbs: ["get", "list", "watch"]
+    - apiGroups: ["apps"]
+      resources: ["replicasets"]
+      verbs: ["get", "list", "watch"]
 service:
   enabled: true
   type: ClusterIP
-
 ports:
   otlp:
     enabled: true
@@ -38,7 +55,6 @@ ports:
     enabled: false
   zipkin:
     enabled: false
-
 serviceMonitor:
   enabled: true
   metricsEndpoints:
@@ -46,21 +62,35 @@ serviceMonitor:
       interval: 30s
     - port: app-metrics
       interval: 30s
-
 config:
   exporters:
-    debug:
-      verbosity: basic
+    debug: null
+    otlp/tempo:
+      endpoint: tempo.monitoring.svc.cluster.local:4317
+      tls:
+        insecure: true
     prometheus:
       endpoint: ${env:MY_POD_IP}:8889
-
+      resource_to_telemetry_conversion:
+        enabled: true
   processors:
     batch: {}
+    k8sattributes:
+      auth_type: serviceAccount
+      extract:
+        metadata:
+          - k8s.namespace.name
+          - k8s.node.name
+          - k8s.pod.name
+          - k8s.pod.uid
+          - k8s.deployment.name
+      pod_association:
+        - sources:
+            - from: connection
     memory_limiter:
       check_interval: 5s
       limit_percentage: 80
       spike_limit_percentage: 25
-
   receivers:
     otlp:
       protocols:
@@ -68,45 +98,32 @@ config:
           endpoint: ${env:MY_POD_IP}:4317
         http:
           endpoint: ${env:MY_POD_IP}:4318
-    prometheus:
-      config:
-        scrape_configs:
-          - job_name: opentelemetry-collector
-            scrape_interval: 30s
-            static_configs:
-              - targets:
-                  - ${env:MY_POD_IP}:8888
-
+    jaeger: null
+    prometheus: null
+    zipkin: null
   service:
     extensions:
       - health_check
     pipelines:
-      logs:
-        receivers:
-          - otlp
-        processors:
-          - memory_limiter
-          - batch
-        exporters:
-          - debug
+      logs: null
       metrics:
         receivers:
           - otlp
-          - prometheus
         processors:
           - memory_limiter
+          - k8sattributes
           - batch
         exporters:
           - prometheus
-          - debug
       traces:
         receivers:
           - otlp
         processors:
           - memory_limiter
+          - k8sattributes
           - batch
         exporters:
-          - debug
+          - otlp/tempo
     telemetry:
       metrics:
         readers:
@@ -115,7 +132,8 @@ config:
                 prometheus:
                   host: ${env:MY_POD_IP}
                   port: 8888
-
+nodeSelector:
+  role: system
 tolerations:
   - key: CriticalAddonsOnly
     operator: Exists

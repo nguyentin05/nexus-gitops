@@ -1,20 +1,20 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: opentelemetry-collector
+  name: tempo
   namespace: argocd
   annotations:
-    argocd.argoproj.io/sync-wave: "8"
+    argocd.argoproj.io/sync-wave: "7"
 spec:
   project: default
   sources:
-    - repoURL: https://open-telemetry.github.io/opentelemetry-helm-charts
-      chart: opentelemetry-collector
-      targetRevision: 0.165.0
+    - repoURL: https://grafana.github.io/helm-charts
+      chart: tempo
+      targetRevision: 1.24.4
       helm:
         valueFiles:
-          - $values/platform/opentelemetry-collector/values.yaml
-          - $values/envs/prod/aws/ap-southeast-1/platform/opentelemetry-collector/values.yaml
+          - $values/platform/tempo/values.yaml
+          - $values/envs/prod/aws/ap-southeast-1/platform/tempo/values.yaml
     - repoURL: https://github.com/nguyentin05/nexus-gitops.git
       targetRevision: production
       ref: values

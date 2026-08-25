@@ -1,0 +1,42 @@
+fullnameOverride: tempo
+replicas: 1
+
+tempo:
+  reportingEnabled: false
+  memBallastSizeMbs: 0
+  retention: 24h
+  receivers:
+    otlp:
+      protocols:
+        grpc:
+          endpoint: 0.0.0.0:4317
+        http:
+          endpoint: 0.0.0.0:4318
+  securityContext:
+    allowPrivilegeEscalation: false
+    capabilities:
+      drop:
+        - ALL
+    readOnlyRootFilesystem: true
+  extraVolumeMounts:
+    - name: tempo-data
+      mountPath: /var/tempo
+
+persistence:
+  enabled: false
+
+extraVolumes:
+  - name: tempo-data
+    emptyDir: {}
+
+serviceMonitor:
+  enabled: true
+  interval: 30s
+
+nodeSelector:
+  role: system
+
+tolerations:
+  - key: CriticalAddonsOnly
+    operator: Exists
+    effect: NoSchedule

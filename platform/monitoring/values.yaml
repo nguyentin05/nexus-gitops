@@ -47,6 +47,12 @@ grafana:
       jsonData:
         authType: default
         defaultRegion: ap-southeast-1
+    - name: Tempo
+      uid: tempo
+      type: tempo
+      access: proxy
+      url: http://tempo.monitoring.svc.cluster.local:3200
+      isDefault: false
   sidecar:
     dashboards:
       enabled: true
