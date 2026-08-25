@@ -1,7 +1,7 @@
 replicaCount: 1
 image:
   repository: 065320271480.dkr.ecr.ap-southeast-1.amazonaws.com/nexus-profile-service
-  tag: v0.1.7
+  tag: v0.2.0
   pullPolicy: IfNotPresent
 service:
   type: ClusterIP
@@ -32,7 +32,6 @@ serviceAccount:
   name: ""
   annotations:
     eks.amazonaws.com/role-arn: arn:aws:iam::065320271480:role/dev-profile-service-irsa
-
 telemetry:
   environment: dev
   tracesSamplerArg: "1.0"
