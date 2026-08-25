@@ -83,7 +83,7 @@ jobs:
           fi
 
   helm-lint:
-    name: Helm lint (${{ matrix.service }})
+    name: Helm lint
     needs: detect-changes
     if: needs.detect-changes.outputs.services_changed == 'true'
     runs-on: ubuntu-latest
