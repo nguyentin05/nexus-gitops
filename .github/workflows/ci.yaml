@@ -89,11 +89,9 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-    strategy:
-      fail-fast: false
-      matrix: ${{ fromJSON(needs.detect-changes.outputs.service_matrix) }}
     env:
       ENVIRONMENT: ${{ needs.detect-changes.outputs.environment }}
+      SERVICE_MATRIX: ${{ needs.detect-changes.outputs.service_matrix }}
     steps:
       - name: Checkout
         uses: actions/checkout@v7.0.1
@@ -101,8 +99,12 @@ jobs:
       - name: Helm tool installer
         uses: Azure/setup-helm@v5.0.1
 
-      - name: Lint Helm chart
-        run: helm lint "charts/${{ matrix.service }}" --values "charts/${{ matrix.service }}/values-$ENVIRONMENT.yaml"
+      - name: Lint Helm charts
+        run: |
+          set -euo pipefail
+          jq -r '.include[].service' <<< "$SERVICE_MATRIX" | while IFS= read -r service; do
+            helm lint "charts/$service" --values "charts/$service/values-$ENVIRONMENT.yaml"
+          done
 
   manifest-lint:
     name: Kubeconform
