@@ -77,7 +77,7 @@ ArgoCD sync waves establish dependencies between platform components:
 | `5` | Kyverno policies | Activate workload security rules after Kyverno is ready |
 | `6` | Monitoring and AWS Load Balancer Controller | Provide metrics and AWS target registration |
 | `7` | Envoy Gateway, Loki, OpenTelemetry, Falco, and production Argo Rollouts | Install traffic, telemetry, runtime security, and rollout controllers |
-| `8` | Envoy routing configuration and Promtail | Configure public routing and log collection |
+| `8` | Envoy routing configuration and OpenTelemetry logs | Configure public routing and OTLP log collection |
 | `9` | Application services and Grafana dashboards | Deploy business workloads after their dependencies |
 
 ## Prerequisites

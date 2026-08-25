@@ -4,6 +4,21 @@ loki:
   auth_enabled: false
   commonConfig:
     replication_factor: 1
+  limits_config:
+    allow_structured_metadata: true
+    otlp_config:
+      resource_attributes:
+        ignore_defaults: true
+        attributes_config:
+          - action: index_label
+            attributes:
+              - namespace
+              - container
+              - service.name
+              - service.namespace
+              - k8s.deployment.name
+              - k8s.daemonset.name
+              - k8s.statefulset.name
   storage:
     type: filesystem
   schemaConfig:
@@ -50,6 +65,10 @@ resultsCache:
 
 lokiCanary:
   enabled: false
+
+sidecar:
+  rules:
+    enabled: false
 
 test:
   enabled: false

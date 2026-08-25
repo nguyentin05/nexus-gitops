@@ -1,0 +1,30 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: opentelemetry-logs
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "8"
+spec:
+  project: default
+  sources:
+    - repoURL: https://open-telemetry.github.io/opentelemetry-helm-charts
+      chart: opentelemetry-collector
+      targetRevision: 0.165.0
+      helm:
+        valueFiles:
+          - $values/platform/opentelemetry-logs/values.yaml
+          - $values/envs/prod/aws/ap-southeast-1/platform/opentelemetry-logs/values.yaml
+    - repoURL: https://github.com/nguyentin05/nexus-gitops.git
+      targetRevision: production
+      ref: values
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: monitoring
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true
