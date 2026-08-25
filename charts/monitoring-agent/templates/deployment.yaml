@@ -64,6 +64,11 @@ spec:
               value: {{ .Values.config.incidentCooldown | quote }}
             - name: MAX_BEDROCK_CALLS_PER_HOUR
               value: {{ .Values.config.maxBedrockCallsPerHour | quote }}
+            - name: DISCORD_WEBHOOK_URL
+              valueFrom:
+                secretKeyRef:
+                  name: monitoring-agent-discord
+                  key: DISCORD_WEBHOOK_URL
           livenessProbe:
             httpGet:
               path: /healthz

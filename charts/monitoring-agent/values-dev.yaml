@@ -3,8 +3,12 @@ image:
   tag: bootstrap-v0.1.0
 
 serviceAccount:
+  name: nexus-monitoring-agent
   annotations:
     eks.amazonaws.com/role-arn: arn:aws:iam::065320271480:role/dev-monitoring-agent-irsa
+
+config:
+  mode: detect
 
 nodeSelector:
   role: system

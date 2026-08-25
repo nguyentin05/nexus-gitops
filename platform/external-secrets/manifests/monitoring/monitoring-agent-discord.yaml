@@ -1,0 +1,18 @@
+apiVersion: external-secrets.io/v1
+kind: ExternalSecret
+metadata:
+  name: monitoring-agent-discord
+  namespace: monitoring
+spec:
+  refreshInterval: 1h
+  secretStoreRef:
+    name: vault-monitoring
+    kind: SecretStore
+  target:
+    name: monitoring-agent-discord
+    creationPolicy: Owner
+  data:
+    - secretKey: DISCORD_WEBHOOK_URL
+      remoteRef:
+        key: monitoring/alertmanager
+        property: DISCORD_WEBHOOK_URL
