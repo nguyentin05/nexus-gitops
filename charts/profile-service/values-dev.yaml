@@ -1,7 +1,7 @@
 replicaCount: 1
 image:
   repository: 065320271480.dkr.ecr.ap-southeast-1.amazonaws.com/nexus-profile-service
-  tag: v0.2.5
+  tag: v0.2.6
   pullPolicy: IfNotPresent
 service:
   type: ClusterIP
