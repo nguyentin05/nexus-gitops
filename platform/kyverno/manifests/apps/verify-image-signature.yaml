@@ -18,7 +18,7 @@ spec:
               namespaces:
                 - apps
       verifyImages:
-        - type: SigstoreBundle
+        - type: Cosign
           imageReferences:
             - "863547508328.dkr.ecr.ap-southeast-1.amazonaws.com/nexus-auth-service:*"
             - "863547508328.dkr.ecr.ap-southeast-1.amazonaws.com/nexus-profile-service:*"
@@ -29,12 +29,56 @@ spec:
           imageRegistryCredentials:
             providers:
               - amazon
+          attestors:
+            - entries:
+                - keyless:
+                    subject: "https://github.com/nguyentin05/nexus-app/.github/workflows/cd.yml@refs/heads/main"
+                    issuer: "https://token.actions.githubusercontent.com"
+                    rekor:
+                      url: https://rekor.sigstore.dev
           attestations:
-            - type: https://sigstore.dev/cosign/sign/v1
+            - type: https://spdx.dev/Document
               attestors:
                 - entries:
                     - keyless:
                         subject: "https://github.com/nguyentin05/nexus-app/.github/workflows/cd.yml@refs/heads/main"
+                        issuer: "https://token.actions.githubusercontent.com"
+                        rekor:
+                          url: https://rekor.sigstore.dev
+                      signatureAlgorithm: sha256
+    - name: verify-monitoring-agent-image
+      skipBackgroundRequests: true
+      match:
+        any:
+          - resources:
+              kinds:
+                - Pod
+              namespaces:
+                - monitoring
+      verifyImages:
+        - type: Cosign
+          imageReferences:
+            - "863547508328.dkr.ecr.ap-southeast-1.amazonaws.com/nexus-monitoring-agent:*"
+          mutateDigest: false
+          useCache: true
+          verifyDigest: false
+          required: true
+          imageRegistryCredentials:
+            providers:
+              - amazon
+          attestors:
+            - entries:
+                - keyless:
+                    subject: "https://github.com/nguyentin05/nexus-monitoring-agent/.github/workflows/cd.yml@refs/heads/main"
+                    issuer: "https://token.actions.githubusercontent.com"
+                    rekor:
+                      url: https://rekor.sigstore.dev
+          attestations:
+            - type: https://spdx.dev/Document
+              attestors:
+                - entries:
+                    - keyless:
+                        subject: "https://github.com/nguyentin05/nexus-monitoring-agent/.github/workflows/cd.yml@refs/heads/main"
                         issuer: "https://token.actions.githubusercontent.com"
                         rekor:
                           url: https://rekor.sigstore.dev
