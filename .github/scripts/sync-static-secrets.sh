@@ -7,11 +7,9 @@ set -eu
 : "${USER_EVENTS_QUEUE_URL:?USER_EVENTS_QUEUE_URL is required}"
 : "${JWT_SECRET:?JWT_SECRET is required}"
 : "${DISCORD_WEBHOOK_URL:?DISCORD_WEBHOOK_URL is required}"
-: "${GEMINI_API_KEY:?GEMINI_API_KEY is required}"
 
 vault kv put kv/monitoring/alertmanager \
-  DISCORD_WEBHOOK_URL="$DISCORD_WEBHOOK_URL" \
-  GEMINI_API_KEY="$GEMINI_API_KEY"
+  DISCORD_WEBHOOK_URL="$DISCORD_WEBHOOK_URL"
 
 vault kv put kv/auth-service/config \
   DATABASE_ENDPOINT="$DATABASE_ENDPOINT" \
