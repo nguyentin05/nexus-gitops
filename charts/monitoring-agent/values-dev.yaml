@@ -1,14 +1,15 @@
 image:
-  repository: 065320271480.dkr.ecr.ap-southeast-1.amazonaws.com/nexus-monitoring-agent
+  repository: 863547508328.dkr.ecr.ap-southeast-1.amazonaws.com/nexus-monitoring-agent
   tag: bootstrap-v0.1.0
 
 serviceAccount:
   name: nexus-monitoring-agent
   annotations:
-    eks.amazonaws.com/role-arn: arn:aws:iam::065320271480:role/dev-monitoring-agent-irsa
+    eks.amazonaws.com/role-arn: arn:aws:iam::863547508328:role/dev-monitoring-agent-irsa
 
 config:
   mode: detect
+  llmProvider: gemini
 
 nodeSelector:
   role: system

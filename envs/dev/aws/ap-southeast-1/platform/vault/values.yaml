@@ -1,7 +1,7 @@
 server:
   serviceAccount:
     annotations:
-      eks.amazonaws.com/role-arn: arn:aws:iam::065320271480:role/dev-vault-irsa
+      eks.amazonaws.com/role-arn: arn:aws:iam::863547508328:role/dev-vault-irsa
   resources:
     requests:
       cpu: 250m

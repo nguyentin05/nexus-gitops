@@ -3,7 +3,7 @@ rollout:
   enabled: true
 
 image:
-  repository: 065320271480.dkr.ecr.ap-southeast-1.amazonaws.com/nexus-profile-service
+  repository: 863547508328.dkr.ecr.ap-southeast-1.amazonaws.com/nexus-profile-service
   tag: prod
   pullPolicy: IfNotPresent
 
@@ -23,7 +23,7 @@ nodeSelector:
 
 serviceAccount:
   annotations:
-    eks.amazonaws.com/role-arn: arn:aws:iam::065320271480:role/prod-profile-service-irsa
+    eks.amazonaws.com/role-arn: arn:aws:iam::863547508328:role/prod-profile-service-irsa
 
 telemetry:
   environment: prod

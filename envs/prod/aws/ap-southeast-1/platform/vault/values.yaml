@@ -1,7 +1,7 @@
 server:
   serviceAccount:
     annotations:
-      eks.amazonaws.com/role-arn: arn:aws:iam::065320271480:role/prod-vault-irsa
+      eks.amazonaws.com/role-arn: arn:aws:iam::863547508328:role/prod-vault-irsa
   resources:
     requests:
       cpu: 500m

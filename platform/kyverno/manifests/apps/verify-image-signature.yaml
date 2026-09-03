@@ -20,8 +20,8 @@ spec:
       verifyImages:
         - type: SigstoreBundle
           imageReferences:
-            - "065320271480.dkr.ecr.ap-southeast-1.amazonaws.com/nexus-auth-service:*"
-            - "065320271480.dkr.ecr.ap-southeast-1.amazonaws.com/nexus-profile-service:*"
+            - "863547508328.dkr.ecr.ap-southeast-1.amazonaws.com/nexus-auth-service:*"
+            - "863547508328.dkr.ecr.ap-southeast-1.amazonaws.com/nexus-profile-service:*"
           mutateDigest: false
           useCache: true
           verifyDigest: false

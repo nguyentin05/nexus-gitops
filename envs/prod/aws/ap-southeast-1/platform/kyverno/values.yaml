@@ -3,14 +3,14 @@ admissionController:
   rbac:
     serviceAccount:
       annotations:
-        eks.amazonaws.com/role-arn: arn:aws:iam::065320271480:role/prod-kyverno-image-verifier-irsa
+        eks.amazonaws.com/role-arn: arn:aws:iam::863547508328:role/prod-kyverno-image-verifier-irsa
 
 backgroundController:
   replicas: 1
   rbac:
     serviceAccount:
       annotations:
-        eks.amazonaws.com/role-arn: arn:aws:iam::065320271480:role/prod-kyverno-image-verifier-irsa
+        eks.amazonaws.com/role-arn: arn:aws:iam::863547508328:role/prod-kyverno-image-verifier-irsa
 
 cleanupController:
   replicas: 1

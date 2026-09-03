@@ -12,7 +12,7 @@ alertmanager:
 grafana:
   serviceAccount:
     annotations:
-      eks.amazonaws.com/role-arn: arn:aws:iam::065320271480:role/dev-grafana-cloudwatch-irsa
+      eks.amazonaws.com/role-arn: arn:aws:iam::863547508328:role/dev-grafana-cloudwatch-irsa
   persistence:
     enabled: false
   resources:

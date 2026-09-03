@@ -4,7 +4,7 @@ rollout:
   enabled: true
 
 image:
-  repository: 065320271480.dkr.ecr.ap-southeast-1.amazonaws.com/nexus-auth-service
+  repository: 863547508328.dkr.ecr.ap-southeast-1.amazonaws.com/nexus-auth-service
   tag: prod
   pullPolicy: IfNotPresent
 
@@ -24,7 +24,7 @@ nodeSelector:
 
 serviceAccount:
   annotations:
-    eks.amazonaws.com/role-arn: arn:aws:iam::065320271480:role/prod-auth-service-irsa
+    eks.amazonaws.com/role-arn: arn:aws:iam::863547508328:role/prod-auth-service-irsa
 
 telemetry:
   environment: prod

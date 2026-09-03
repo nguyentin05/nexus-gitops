@@ -1,6 +1,6 @@
 replicaCount: 1
 image:
-  repository: 065320271480.dkr.ecr.ap-southeast-1.amazonaws.com/nexus-profile-service
+  repository: 863547508328.dkr.ecr.ap-southeast-1.amazonaws.com/nexus-profile-service
   tag: v0.2.16
   pullPolicy: IfNotPresent
 service:
@@ -31,7 +31,7 @@ serviceAccount:
   create: true
   name: ""
   annotations:
-    eks.amazonaws.com/role-arn: arn:aws:iam::065320271480:role/dev-profile-service-irsa
+    eks.amazonaws.com/role-arn: arn:aws:iam::863547508328:role/dev-profile-service-irsa
 telemetry:
   environment: dev
   tracesSamplerArg: "1.0"

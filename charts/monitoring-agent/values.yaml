@@ -22,6 +22,8 @@ serviceMonitor:
 
 config:
   mode: shadow
+  llmProvider: bedrock
+  geminiModel: gemini-2.5-flash
   awsRegion: ap-southeast-1
   bedrockModelId: global.amazon.nova-2-lite-v1:0
   prometheusUrl: http://monitoring-prometheus.monitoring.svc.cluster.local:9090

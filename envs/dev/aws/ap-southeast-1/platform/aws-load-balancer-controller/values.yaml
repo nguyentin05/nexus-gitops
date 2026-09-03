@@ -2,7 +2,7 @@ replicaCount: 1
 
 serviceAccount:
   annotations:
-    eks.amazonaws.com/role-arn: arn:aws:iam::065320271480:role/dev-aws-load-balancer-controller-irsa
+    eks.amazonaws.com/role-arn: arn:aws:iam::863547508328:role/dev-aws-load-balancer-controller-irsa
 
 clusterName: dev-major-eks
 region: ap-southeast-1
