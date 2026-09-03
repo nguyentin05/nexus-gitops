@@ -46,21 +46,10 @@ spec:
           env:
             - name: AGENT_MODE
               value: {{ .Values.config.mode | quote }}
-            - name: LLM_PROVIDER
-              value: {{ .Values.config.llmProvider | quote }}
             - name: AWS_REGION
               value: {{ .Values.config.awsRegion | quote }}
             - name: BEDROCK_MODEL_ID
               value: {{ .Values.config.bedrockModelId | quote }}
-            - name: GEMINI_MODEL
-              value: {{ .Values.config.geminiModel | quote }}
-            {{- if eq .Values.config.llmProvider "gemini" }}
-            - name: GEMINI_API_KEY
-              valueFrom:
-                secretKeyRef:
-                  name: monitoring-agent-discord
-                  key: GEMINI_API_KEY
-            {{- end }}
             - name: PROMETHEUS_URL
               value: {{ .Values.config.prometheusUrl | quote }}
             - name: LOKI_URL

@@ -7,7 +7,6 @@ serviceAccount:
     eks.amazonaws.com/role-arn: arn:aws:iam::863547508328:role/dev-monitoring-agent-irsa
 config:
   mode: detect
-  llmProvider: gemini
 nodeSelector:
   role: system
 tolerations:
