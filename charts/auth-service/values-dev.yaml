@@ -1,7 +1,7 @@
 replicaCount: 1
 image:
   repository: 863547508328.dkr.ecr.ap-southeast-1.amazonaws.com/nexus-auth-service
-  tag: v0.2.20
+  tag: v0.3.0
   pullPolicy: IfNotPresent
 service:
   type: ClusterIP
