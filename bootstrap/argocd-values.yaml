@@ -7,6 +7,13 @@ global:
     - key: CriticalAddonsOnly
       operator: Exists
       effect: NoSchedule
+  topologySpreadConstraints:
+    - maxSkew: 1
+      topologyKey: kubernetes.io/hostname
+      whenUnsatisfiable: DoNotSchedule
+      labelSelector:
+        matchLabels:
+          app.kubernetes.io/part-of: argocd
 
 configs:
   cm:
@@ -15,6 +22,13 @@ configs:
     timeout.reconciliation: 120s
 
 server:
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 500m
+      memory: 256Mi
   service:
     type: ClusterIP
 
@@ -26,7 +40,7 @@ controller:
       memory: 768Mi
     limits:
       cpu: "1"
-      memory: 1Gi
+      memory: 1280Mi
   env:
     - name: ARGOCD_CONTROLLER_STATUS_PROCESSORS
       value: "1"
@@ -35,9 +49,48 @@ controller:
 
 repoServer:
   replicas: 1
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: "1"
+      memory: 512Mi
 
 applicationSet:
   replicas: 1
+  resources:
+    requests:
+      cpu: 50m
+      memory: 64Mi
+    limits:
+      cpu: 250m
+      memory: 128Mi
 
 redis:
   enabled: true
+  resources:
+    requests:
+      cpu: 50m
+      memory: 64Mi
+    limits:
+      cpu: 250m
+      memory: 128Mi
+
+dex:
+  resources:
+    requests:
+      cpu: 25m
+      memory: 32Mi
+    limits:
+      cpu: 100m
+      memory: 64Mi
+
+notifications:
+  resources:
+    requests:
+      cpu: 25m
+      memory: 32Mi
+    limits:
+      cpu: 100m
+      memory: 64Mi
