@@ -1,13 +1,10 @@
 replicaCount: 2
-
 image:
   repository: 065320271480.dkr.ecr.ap-southeast-1.amazonaws.com/nexus-auth-service
-  tag: prod
+  tag: v0.3.0
   pullPolicy: IfNotPresent
-
 serviceMonitor:
   enabled: true
-
 resources:
   requests:
     cpu: 100m
@@ -15,10 +12,8 @@ resources:
   limits:
     cpu: 500m
     memory: 512Mi
-
 nodeSelector:
   intent: apps
-
 serviceAccount:
   annotations:
     eks.amazonaws.com/role-arn: arn:aws:iam::065320271480:role/prod-auth-service-irsa
