@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: security-benchmark-privileged
+  namespace: apps
+spec:
+  replicas: 0
+  selector:
+    matchLabels:
+      app: security-benchmark-privileged
+  template:
+    metadata:
+      labels:
+        app: security-benchmark-privileged
+    spec:
+      containers:
+        - name: benchmark
+          image: nginx:1.27
+          securityContext:
+            privileged: true
