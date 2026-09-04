@@ -37,16 +37,6 @@ spec:
                     rekor:
                       url: https://rekor.sigstore.dev
                   signatureAlgorithm: sha256
-          attestations:
-            - type: https://spdx.dev/Document
-              attestors:
-                - entries:
-                    - keyless:
-                        subject: "https://github.com/nguyentin05/nexus-app/.github/workflows/cd.yml@refs/heads/main"
-                        issuer: "https://token.actions.githubusercontent.com"
-                        rekor:
-                          url: https://rekor.sigstore.dev
-                      signatureAlgorithm: sha256
     - name: verify-monitoring-agent-image
       skipBackgroundRequests: true
       match:
@@ -75,13 +65,3 @@ spec:
                     rekor:
                       url: https://rekor.sigstore.dev
                   signatureAlgorithm: sha256
-          attestations:
-            - type: https://spdx.dev/Document
-              attestors:
-                - entries:
-                    - keyless:
-                        subject: "https://github.com/nguyentin05/nexus-monitoring-agent/.github/workflows/cd.yml@refs/heads/main"
-                        issuer: "https://token.actions.githubusercontent.com"
-                        rekor:
-                          url: https://rekor.sigstore.dev
-                      signatureAlgorithm: sha256
