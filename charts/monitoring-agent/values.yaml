@@ -28,6 +28,7 @@ config:
   lokiUrl: http://loki-gateway.monitoring.svc.cluster.local
   targetNamespace: apps
   watchedServices: auth-service,profile-service
+  discoveryServices: auth-service,profile-service
   pollInterval: 1m
   incidentCooldown: 10m
   maxBedrockCallsPerHour: 10

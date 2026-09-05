@@ -7,7 +7,8 @@ serviceAccount:
     eks.amazonaws.com/role-arn: arn:aws:iam::863547508328:role/dev-monitoring-agent-irsa
 config:
   mode: detect
-  watchedServices: auth-service,profile-service
+  watchedServices: auth-service,profile-service,aiops-benchmark-service
+  discoveryServices: auth-service,profile-service
   maxBedrockCallsPerHour: 40
 nodeSelector:
   role: system
