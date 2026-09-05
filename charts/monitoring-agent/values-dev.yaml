@@ -5,6 +5,9 @@ serviceAccount:
   name: nexus-monitoring-agent
   annotations:
     eks.amazonaws.com/role-arn: arn:aws:iam::863547508328:role/dev-monitoring-agent-irsa
+persistence:
+  enabled: true
+  storageClass: gp2
 config:
   mode: detect
   watchedServices: auth-service,profile-service,aiops-benchmark-service
