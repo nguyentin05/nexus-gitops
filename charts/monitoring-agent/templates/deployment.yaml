@@ -66,6 +66,12 @@ spec:
               value: {{ .Values.config.incidentCooldown | quote }}
             - name: MAX_BEDROCK_CALLS_PER_HOUR
               value: {{ .Values.config.maxBedrockCallsPerHour | quote }}
+            - name: ADAPTIVE_PLAN_MIN_OBSERVATIONS
+              value: {{ .Values.config.adaptivePlanMinObservations | quote }}
+            - name: ADAPTIVE_PLAN_MIN_SERVICES
+              value: {{ .Values.config.adaptivePlanMinServices | quote }}
+            - name: ADAPTIVE_PLAN_SHADOW_MATCHES
+              value: {{ .Values.config.adaptivePlanShadowMatches | quote }}
             - name: DISCORD_WEBHOOK_URL
               valueFrom:
                 secretKeyRef:
