@@ -72,6 +72,8 @@ spec:
               value: {{ .Values.config.adaptivePlanMinServices | quote }}
             - name: ADAPTIVE_PLAN_SHADOW_MATCHES
               value: {{ .Values.config.adaptivePlanShadowMatches | quote }}
+            - name: ALERTMANAGER_USERNAME
+              value: {{ .Values.config.alertmanagerUsername | quote }}
             - name: DISCORD_WEBHOOK_URL
               valueFrom:
                 secretKeyRef:
