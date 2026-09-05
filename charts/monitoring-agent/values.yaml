@@ -20,6 +20,11 @@ serviceMonitor:
   path: /metrics
   interval: 30s
 
+persistence:
+  enabled: false
+  storageClass: ""
+  size: 1Gi
+
 config:
   mode: shadow
   awsRegion: ap-southeast-1
