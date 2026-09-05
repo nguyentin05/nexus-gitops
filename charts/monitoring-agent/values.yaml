@@ -32,6 +32,9 @@ config:
   pollInterval: 1m
   incidentCooldown: 10m
   maxBedrockCallsPerHour: 10
+  adaptivePlanMinObservations: 5
+  adaptivePlanMinServices: 2
+  adaptivePlanShadowMatches: 3
 
 resources:
   requests:
