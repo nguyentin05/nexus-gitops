@@ -27,6 +27,9 @@ spec:
               - receiver: monitoring-agent
                 match_re:
                   severity: 'warning|critical'
+                group_by: [alertname, namespace, service]
+                group_wait: 5s
+                group_interval: 30s
                 continue: true
               - receiver: discord
                 match_re:
