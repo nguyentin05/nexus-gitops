@@ -35,6 +35,7 @@ config:
   adaptivePlanMinObservations: 5
   adaptivePlanMinServices: 2
   adaptivePlanShadowMatches: 3
+  alertmanagerUsername: system:serviceaccount:monitoring:monitoring-alertmanager
 
 resources:
   requests:
