@@ -58,6 +58,8 @@ spec:
               value: {{ .Values.config.targetNamespace | quote }}
             - name: WATCHED_SERVICES
               value: {{ .Values.config.watchedServices | quote }}
+            - name: DISCOVERY_SERVICES
+              value: {{ .Values.config.discoveryServices | quote }}
             - name: POLL_INTERVAL
               value: {{ .Values.config.pollInterval | quote }}
             - name: INCIDENT_COOLDOWN
