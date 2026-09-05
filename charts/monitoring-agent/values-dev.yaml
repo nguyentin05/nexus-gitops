@@ -1,6 +1,6 @@
 image:
   repository: 863547508328.dkr.ecr.ap-southeast-1.amazonaws.com/nexus-monitoring-agent
-  tag: sha-e495bee4492167cf859ea9dc2d68ad9bda6d6703
+  tag: sha-418c21905684254fb2d1c57d34f6293c45f98187
 serviceAccount:
   name: nexus-monitoring-agent
   annotations:
