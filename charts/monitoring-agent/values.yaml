@@ -31,6 +31,7 @@ config:
   bedrockModelId: global.amazon.nova-2-lite-v1:0
   prometheusUrl: http://monitoring-prometheus.monitoring.svc.cluster.local:9090
   lokiUrl: http://loki-gateway.monitoring.svc.cluster.local
+  tempoUrl: http://tempo.monitoring.svc.cluster.local:3200
   targetNamespace: apps
   watchedServices: auth-service,profile-service
   discoveryServices: auth-service,profile-service

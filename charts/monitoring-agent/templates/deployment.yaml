@@ -65,6 +65,8 @@ spec:
               value: {{ .Values.config.prometheusUrl | quote }}
             - name: LOKI_URL
               value: {{ .Values.config.lokiUrl | quote }}
+            - name: TEMPO_URL
+              value: {{ .Values.config.tempoUrl | quote }}
             - name: TARGET_NAMESPACE
               value: {{ .Values.config.targetNamespace | quote }}
             - name: WATCHED_SERVICES

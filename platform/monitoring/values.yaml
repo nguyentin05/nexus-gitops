@@ -111,6 +111,16 @@ additionalPrometheusRulesMap:
             annotations:
               summary: "Service 5xx rate is above 5%"
               description: "{{ $labels.service }} in {{ $labels.namespace }} has a 5xx rate above 5% for 5 minutes."
+          - alert: NexusServiceHighP99Latency
+            expr: |
+              histogram_quantile(0.99, sum by (namespace, service, le) (rate(nexus_http_request_duration_seconds_bucket{namespace="apps"}[5m]))) > 0.5
+            for: 5m
+            labels:
+              severity: warning
+            annotations:
+              summary: "Service p99 latency is above 500ms"
+              description: "{{ $labels.service }} in {{ $labels.namespace }} has sustained p99 latency above 500ms for 5 minutes."
+
           - alert: NexusPodFrequentRestarts
             expr: sum by (namespace, pod, container) (increase(kube_pod_container_status_restarts_total{namespace="apps"}[15m])) > 3
             for: 5m
