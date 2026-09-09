@@ -101,7 +101,7 @@ jobs:
           set -euo pipefail
           changed=false
           if ! git diff --quiet; then
-            git config user.name "nexus-cicd-bot"
+            git config user.name "nexus-cd-bot"
             git config user.email "$BOT_EMAIL"
             git add "charts/$SERVICE/values-prod.yaml"
             git commit -m "chore($SERVICE): promote $IMAGE_TAG to production"
