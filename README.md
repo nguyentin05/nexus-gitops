@@ -1,95 +1,89 @@
 # Nexus GitOps
 
-## Overview
+GitOps source of truth for deploying and operating Kubernetes workloads on
+Amazon EKS with Argo CD.
 
-This repository is the source of truth for the desired Kubernetes state of the
-Nexus platform. ArgoCD continuously reconciles platform components,
-security controls, observability services, routing resources, and application
-workloads from Git into separate development and production clusters.
+## About
 
-The repository owns:
+This repository manages the desired state of:
 
-- ArgoCD App-of-Apps definitions and sync ordering
-- Helm charts for microservices architecture from nexus-app
-- environment-specific application and platform configuration
-- Vault, ESO, Envoy Gateway, Kyverno, Falco, and the observability stack
-- development DAST and reviewed production promotion workflows
-- production canary delivery with Argo Rollouts and Prometheus analysis
+- Application microservices and the AIOps agent
+- Vault and External Secrets Operator
+- Envoy Gateway and AWS Load Balancer Controller
+- Kyverno, Falco, and Argo Rollouts
+- Prometheus, Grafana, Loki, Tempo, and OpenTelemetry
 
-## Environment Organization
+This repository contains only the Kubernetes configuration reconciled by Argo CD.
 
-Environment configuration follows this hierarchy:
+## Sync Waves
+
+Argo CD deploys components in dependency order:
+
+| Wave | Components |
+| ---: | --- |
+| `-1` | Namespaces |
+| `1` | Vault |
+| `2` | External Secrets Operator |
+| `3` | External Secrets configuration |
+| `4` | Kyverno |
+| `5` | Kyverno policies |
+| `6` | Prometheus stack and AWS Load Balancer Controller |
+| `7` | Envoy Gateway, Loki, Tempo, Falco, and production Argo Rollouts |
+| `8` | Gateway configuration and OpenTelemetry collectors |
+| `9` | Application services and Grafana dashboards |
+| `10` | Development AIOps agent |
+
+## Repository Structure
 
 ```text
-envs/<environment>/<cloud>/<region>/
-|-- applications/    # ArgoCD Application definitions
-`-- platform/        # Environment-specific Helm values and manifests
-```
-
-The current environments are:
-
-```text
+bootstrap/                 Argo CD installation and root Applications
+charts/                    Helm charts for application workloads
 envs/
-|-- dev/aws/ap-southeast-1/
-`-- prod/aws/ap-southeast-1/
+  dev/aws/ap-southeast-1/  Development configuration
+  prod/aws/ap-southeast-1/ Production configuration
+namespaces/                Namespace definitions
+platform/                  Shared platform manifests and Helm values
+.github/workflows/         Validation, delivery, and promotion workflows
 ```
 
-| Environment | Branch | ArgoCD application root | Application workload |
-| --- | --- | --- | --- |
-| Development | `main` | `envs/dev/aws/ap-southeast-1/applications` | Kubernetes Deployment |
-| Production | `production` | `envs/prod/aws/ap-southeast-1/applications` | Argo Rollouts canary |
+## Environments
 
-Reusable platform defaults and manifests live in `platform/`. Reusable
-application charts live in `charts/`. Each environment selects those shared
-resources and applies only its required overrides.
-
-This layout can add another environment, cloud platform, or region without
-mixing its ArgoCD applications and values with an existing deployment target.
+| Environment | Branch | Delivery strategy |
+| --- | --- | --- |
+| Development | `main` | Kubernetes Deployment |
+| Production | `production` | Argo Rollouts canary |
 
 ## Delivery Flow
 
-1. A service change is merged into app services.
-2. Application CI validates the service, builds and scans the image, publishes it to ECR, and signs it with Cosign.
-3. The application workflow opens a PR that updates the service image tag in values-dev.yaml on main.
-4. GitOps CI runs change detection, environment-specific Helm lint, Kubeconform, and Trivy configuration scanning.
-5. The development PR auto-merges after its required checks pass.
-6. Development ArgoCD reconciles the new immutable image as a Kubernetes Deployment.
-7. DAST waits for that exact image and a healthy rollout, then scans the service OpenAPI endpoint with OWASP ZAP.
-8. A successful DAST run creates or updates a service-specific promotion PR targeting production and requests manual review.
-9. After approval and merge, production ArgoCD reconciles the image and Argo Rollouts performs the Prometheus-gated canary deployment.
-10. Kyverno validates the workload at admission while Falco and the observability stack monitor it at runtime.
+![GitOps delivery flow](docs/flowchart.png)
 
-Service-specific promotion branches and concurrency groups prevent unrelated
-services from conflicting. A newer validated image updates the existing open
-promotion PR for the same service.
+*GitOps delivery pipeline.*
 
-## Sync Wave Ordering
+1. An application repository builds, scans, signs, and publishes an immutable
+   container image.
+2. Its workflow opens a pull request that updates the development image
+   version in this repository.
+3. GitOps CI validates the affected Helm chart and Kubernetes configuration.
+4. Argo CD reconciles the merged desired state to the development cluster.
+5. After development validation, a reviewed pull request promotes the image to
+   the `production` branch.
+6. Argo Rollouts performs a Prometheus-gated canary deployment in production.
 
-ArgoCD sync waves establish dependencies between platform components:
+## Quick Start
 
-| Wave | Components | Purpose |
-| --- | --- | --- |
-| `-1` | Namespaces | Create resource boundaries before namespaced workloads |
-| `1` | Vault | Start the secret source of truth |
-| `2` | External Secrets Operator | Install the secret synchronization controller |
-| `3` | SecretStore, ExternalSecret, and Vault configuration | Connect workloads to Vault-backed secrets |
-| `4` | Kyverno | Install the admission and policy controllers |
-| `5` | Kyverno policies | Activate workload security rules after Kyverno is ready |
-| `6` | Monitoring and AWS Load Balancer Controller | Provide metrics and AWS target registration |
-| `7` | Envoy Gateway, Loki, OpenTelemetry, Falco, and production Argo Rollouts | Install traffic, telemetry, runtime security, and rollout controllers |
-| `8` | Envoy routing configuration and OpenTelemetry logs | Configure public routing and OTLP log collection |
-| `9` | Application services and Grafana dashboards | Deploy business workloads after their dependencies |
+### Prerequisites
 
-## Prerequisites
+- Helm
+- A GitHub App with read access to this repository
 
-- Nexus AWS infrastructure provisioned from `nexus-infra`
-- a reachable EKS cluster and valid AWS credentials
-- AWS CLI, kubectl, Helm, Terraform
-- a GitHub App with repository `Contents: Read-only` permission for ArgoCD
-- IAM roles and EKS access required by ArgoCD bootstrap and GitHub Actions OIDC
-- AWS KMS, RDS, ECR, SQS, and target group outputs for the selected environment
-- repository secrets required by Vault synchronization and production promotion
+### Bootstrap
 
-## Getting Started
+Create the ignored GitHub App values file, add the App ID, installation ID, and
+private key, then bootstrap the target environment:
 
-Coming soon.
+```bash
+cp bootstrap/argocd-github-app-values.yaml.example bootstrap/argocd-github-app-values.yaml
+./scripts/bootstrap-argocd.sh <environment> (dev/prod)
+```
+
+See [`bootstrap/README.md`](bootstrap/README.md) for detailed configuration and commands.
